@@ -15,11 +15,17 @@ import edu.wpi.first.wpilibj.util.Units;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.print.CancelablePrintJob;
+
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANPIDController;
+
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -37,6 +43,8 @@ public class Robot extends TimedRobot {
   //private SparkMax HandleExtension;
   private CANSparkMax shootTop;
   private CANSparkMax shootBottom;
+  private CANEncoder shootTopEnc;
+  private CANEncoder shootBottomEnc;
   //private SparkMax HandleDrive;
 
   private WPI_VictorSPX kicker;
@@ -59,10 +67,11 @@ public class Robot extends TimedRobot {
   private double midx2 = 0;
   private double tensortime = 0;
 
-  private int t = 0;
-  private boolean i = false;
-
   private double offset = 75; //Change Offsett value
+
+  private int t = 0;
+  private int s = 0;
+  private boolean i = false;
 
   private String Visionclass = "";
 
@@ -78,8 +87,22 @@ public class Robot extends TimedRobot {
   private Joystick spStick = new Joystick(1);
   private DifferentialDrive drive;
 
-  private int lStop = 23396; //CHANGE LATER
-  private int rStop = -11855; //CHANGE LATER
+  private int lStop = 50; //CHANGE LATER
+  private int rStop = -31200; //CHANGE LATER
+
+  private double kP = 0.1;
+  private double kI = 1e-4;
+  private double kD = 1;
+  private double kIz = 0;
+  private double kFF = 0;
+
+  private double kMaxOutput = 1;
+  private double kMinOutput = -1;
+
+  private CANPIDController topWheelPID;
+  private CANPIDController botWheelPID;
+
+  
 
   /**1
    * This function is run when the robot is first started up and should be
@@ -100,6 +123,24 @@ public class Robot extends TimedRobot {
     shootTurret.setNeutralMode(NeutralMode.Brake);
     shootTop = new CANSparkMax(45, MotorType.kBrushless);
     shootBottom = new CANSparkMax(53, MotorType.kBrushless);
+    shootTopEnc = new CANEncoder(shootTop);
+    shootBottomEnc = new CANEncoder(shootBottom);
+    
+    botWheelPID = shootBottom.getPIDController();
+    botWheelPID.setP(kP);
+    botWheelPID.setI(kI);
+    botWheelPID.setD(kD);
+    botWheelPID.setIZone(kIz);
+    botWheelPID.setFF(kFF);
+    botWheelPID.setOutputRange(kMinOutput, kMaxOutput);
+
+    topWheelPID = shootTop.getPIDController();
+    topWheelPID.setP(kP);
+    topWheelPID.setI(kI);
+    topWheelPID.setD(kD);
+    topWheelPID.setIZone(kIz);
+    topWheelPID.setFF(kFF);
+    topWheelPID.setOutputRange(kMinOutput, kMaxOutput);
     
     kicker = new WPI_VictorSPX(7);
     sequencer = new CANSparkMax(46, MotorType.kBrushless);
@@ -155,6 +196,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+    //This gets all the numbers we need from the smart dashboard
     distoff = SmartDashboard.getNumber("distance off", 0);
     Visionclass = SmartDashboard.getString("class", "");
     size = SmartDashboard.getNumber("size", 0);
@@ -163,140 +205,199 @@ public class Robot extends TimedRobot {
 
     //Specials stuff
 
-    //Vision target
+    //Vision target, if the button is pressed vision kicks in
     if(spStick.getRawButton(7)){
-      camnum = 1;
+      //SmartDashboard.putNumber("cam", 0);
       if(Visionclass.compareTo("Target") >= 0){
+
         if((shootTurret.getSelectedSensorPosition() < lStop && shootTurret.getSelectedSensorPosition() > rStop)){
+
           if(size > 200 && size != 0){
+
             if(distoff < 270 && distoff > 370){
               Turnvaltar = 0;
             }
+
+            else{
+              Turnvaltar = (0.003125 * distoff);  
+              Turnvaltar = Turnvaltar * 0.3;
+            }
+
+          }
+          else if(size < 200 && size != 0){
+
+            if(distoff < 270 && distoff > 370){
+              Turnvaltar = 0;
+            }
+
+            else{
+                Turnvaltar = (0.003125 * distoff);  
+                Turnvaltar = Turnvaltar * 0.3;
+              }
+
+          }
+        }
+        else if(shootTurret.getSelectedSensorPosition() <= rStop){
+
+          if(Turnvaltar > 0){
+
+            if(size > 200 && size != 0){
+
+              if(distoff < 270 && distoff > 370){
+                Turnvaltar = 0;
+              }
+              else{
+                Turnvaltar = (0.003125 * distoff);  
+                Turnvaltar = Turnvaltar * 0.4;
+              }
+
+            }
+
+            else if(size < 200 && size != 0){
+
+              if(distoff < 270 && distoff > 370){
+                Turnvaltar = 0;
+              }
+
             else{
               Turnvaltar = (0.003125 * distoff);  
               Turnvaltar = Turnvaltar * 0.4;
-              //Turnvalball = (0.005 * distoff); 
-              //Turnvalball = Math.copySign(Math.min(.8, Math.abs(Turnvalball)), Turnvalball);
+              }
+
             }
           }
-          else if(size < 200 && size != 0){
-            if(distoff < 270 && distoff > 370){
-              Turnvaltar = 0;
+
+          else{
+            Turnvaltar = 0;
             }
-            else{
+  
+        }
+
+        else if(shootTurret.getSelectedSensorPosition() >= lStop){
+
+          if(Turnvaltar < 0){
+
+            if(size > 200 && size != 0){
+
+              if(distoff < 250 && distoff > 390){
+                Turnvaltar = 0;
+              }
+
+              else{
                 Turnvaltar = (0.003125 * distoff);  
                 Turnvaltar = Turnvaltar * 0.4;
               }
+
+            }
+
+            else if(size < 200 && size != 0){
+
+              if(distoff < 270 && distoff > 370){
+                Turnvaltar = 0;
+              }
+
+              else{
+                Turnvaltar = (0.003125 * distoff);  
+                Turnvaltar = Turnvaltar * 0.4;
+              }
+
+            }
+
           }
+          else{
+            Turnvaltar = 0;
+          }
+
+        }
+        
         else{
           Turnvaltar = 0;
-        }
-      }
-      else if(shootTurret.getSelectedSensorPosition() <= rStop){
-          if(Turnvaltar > 0){
-            if(size > 200 && size != 0){
-              if(distoff < 270 && distoff > 370){
-                Turnvaltar = 0;
-            }
-              else{
-                Turnvaltar = (0.003125 * distoff);  
-                Turnvaltar = Turnvaltar * 0.4;
-                //Turnvalball = (0.005 * distoff); 
-                //Turnvalball = Math.copySign(Math.min(.8, Math.abs(Turnvalball)), Turnvalball);
-              }
-            }
-            else if(size < 200 && size != 0){
-              if(distoff < 270 && distoff > 370){
-                Turnvaltar = 0;
-              }
-              else{
-                  Turnvaltar = (0.003125 * distoff);  
-                  Turnvaltar = Turnvaltar * 0.4;
-                }
-            }
-          else{
-            Turnvaltar = 0;
-            }
-          }
-          else{
-            Turnvaltar = 0;
-          }
-        }
-        else if(shootTurret.getSelectedSensorPosition() >= lStop){
-          if(Turnvaltar < 0){
-            if(size > 200 && size != 0){
-              if(distoff < 270 && distoff > 370){
-                Turnvaltar = 0;
-            }
-              else{
-                Turnvaltar = (0.003125 * distoff);  
-                Turnvaltar = Turnvaltar * 0.4;
-                //Turnvalball = (0.005 * distoff); 
-                //Turnvalball = Math.copySign(Math.min(.8, Math.abs(Turnvalball)), Turnvalball);
-              }
-            }
-            else if(size < 200 && size != 0){
-              if(distoff < 270 && distoff > 370){
-                Turnvaltar = 0;
-              }
-              else{
-                  Turnvaltar = (0.003125 * distoff);  
-                  Turnvaltar = Turnvaltar * 0.4;
-                }
-            }
-          else{
-            Turnvaltar = 0;
-            }
-          }
-          else{
-            Turnvaltar = 0;
-          }
         }
         shootTurret.set(-Turnvaltar);
       }
     }
+
+    //If the button isnt pressed you can control it
     else{
-      if((shootTurret.getSelectedSensorPosition() < lStop && shootTurret.getSelectedSensorPosition() > rStop) || spStick.getRawButton(6)){
+
+      //if its inbetween the two positions you can move it either way or you hit button 6 or 7
+      if((shootTurret.getSelectedSensorPosition() < lStop && shootTurret.getSelectedSensorPosition() > rStop) || (spStick.getRawButton(6) || spStick.getRawButton(7))){
      
-        shootTurret.set(-spStick.getZ() *0.3);
+        shootTurret.set(-spStick.getZ() * 0.3);
+
       }
+
+      //If it hit one of the stops you can only move one way
       else if(shootTurret.getSelectedSensorPosition() < rStop || shootTurret.getSelectedSensorPosition() > lStop){
+
+        //if it hit the r stop you can only move left
         if(shootTurret.getSelectedSensorPosition() <= rStop){
+
           if(spStick.getZ() < 0){
             shootTurret.set(spStick.getZ() *0.3);
           }
+
           else{
             shootTurret.set(0);
           }
+
         }
+
+        //if it hit the l stop you can only move right
         else if(shootTurret.getSelectedSensorPosition() >= lStop){
+
           if(spStick.getZ() > 0){
             shootTurret.set(spStick.getZ() *0.3);
           }
+
           else{
             shootTurret.set(0);
           }
+
         }
       }
     }
 
 
-    //Shooter and scoopy stuff
-    if(spStick.getRawButton(3) || spStick.getRawButton(5)){
-      kicker.set(-1);
-      shootBottom.set(1);
-      shootTop.set(1);
-    }else if(spStick.getRawButton(12)){
-      kicker.set(0.2);
-    }else{
-      kicker.set(0);
-      shootBottom.set(0);
-      shootTop.set(0);
-    }
+
+    //Shooter rev up
     if(spStick.getRawButton(1)){
-      sequencer.set(0.5);
+      kicker.set(-1);
+      botWheelPID.setReference(4500, ControlType.kVelocity);
+      topWheelPID.setReference(4500, ControlType.kVelocity);
+      shootTurret.set(0);
+
+      //start a counter
+      if(s < 30){
+        s++;
+      }
+
+      else{
+        //if the timer has passed spin the sequencer
+        sequencer.set(0.5);
+        
+      }
+
+    }
+    else{
+      kicker.set(0);
+      shootTop.set(0);
+      shootBottom.set(0);
+      s = 0;
     }
 
+    //ball stuck get out of da robot you goofy goober
+    if(spStick.getRawButton(12) || spStick.getRawButton(11)){
+      kicker.set(0.2);
+      Intake.set(0.5);
+      sequencer.set(-0.2);
+    }
+    else{
+      kicker.set(0);
+      Intake.set(0);
+    }
+
+    //Spool to pick up the arm so we fit ;)
     if(spStick.getRawButton(8)){
       spool.set(.5);
     }
@@ -304,29 +405,35 @@ public class Robot extends TimedRobot {
       spool.set(0);
     }
 
+    //intake the ball - R.I.P Scoopy motor :(
     if(spStick.getRawButton(2)){
       Intake.set(-1);
       sequencer.set(0.2);
-    }else if(spStick.getRawButton(11)){
-      Intake.set(0.5);
-      sequencer.set(-0.2);
-    }else{
+    }
+    else{
       Intake.set(0);
     }
 
-
-    if(!spStick.getRawButton(3) && !spStick.getRawButton(5) && !spStick.getRawButton(2) && !spStick.getRawButton(11)){
+    //turn the sequencer off
+    if(!spStick.getRawButton(2) || !spStick.getRawButton(12) || !spStick.getRawButton(11)){
       sequencer.set(0);
     }
 
 
     //Driver Stuff
+
+    //If you press 1 you vision good
     if(drStick.getRawButton(1)){
-      camnum = 0;
+
+      //Make sure it has a ball
       if(Visionclass.compareTo("ball") >= 0){
+
+        //calulates the turn value of the robot
         if(distoff > 0){
+          //subtract the offset - Make sure you have the correct value!!!
           distoff = distoff - offset;
         }
+
         else{
           distoff = distoff + offset;
         }
@@ -344,41 +451,38 @@ public class Robot extends TimedRobot {
           if(distoff < 270 && distoff > 370){
             Turnvalball = 0;
           }
+
           else{
             Turnvalball = (0.003125 * distoff);  
             Turnvalball = Turnvalball * 0.6;
-          //Turnvalball = (0.005 * distoff); 
-          //Turnvalball = Math.copySign(Math.min(.8, Math.abs(Turnvalball)), Turnvalball);
           }
+
         }
+
         else if(size < 200 && size != 0){
-          if(distoff < 280 && distoff > 360){
+
+          if(distoff < 300 && distoff > 340){
             Turnvalball = 0;
           }
+
           else{
             if(midx2 > 20 || midx2 < -20){
               Turnvalball = (0.003125 * distoff);  
               Turnvalball = Turnvalball * .8;
               Turnvalball = Turnvalball * -1;
             }
+
             else if(t > 51){
               Turnvalball = (0.003125 * distoff);  
               Turnvalball = Turnvalball * 0.6;
             }
-          
-            /*if(midx2 == 0){
-              Turnvalball = (0.003125 * distoff);  
-              Turnvalball = Turnvalball * 0.6;
-            }*/
-          
-          //Turnvalball = (0.005 * distoff); 
-          //Turnvalball = Math.copySign(Math.min(.8, Math.abs(Turnvalball)), Turnvalball);
           }
         }
         else{
           Turnvalball = 0;
         }
   
+        //Calulates the speed value of the robot
         if(size == 0){
           Speedvalball = 0;
         }
@@ -391,21 +495,27 @@ public class Robot extends TimedRobot {
             Speedvalball = ((-0.003125) * size) + 1;
           }
         }
+
+        //actually drive to the robot
         drive.arcadeDrive(Speedvalball, Turnvalball);
-     //drive.arcadeDrive(0, -Turnvalball);
     }
   }
+  //if your not activating vision you can drive nic and corey
   else{
     drive.arcadeDrive(drStick.getY(), -drStick.getZ());
   }
     
+    //puts any nessacary values on the smart dashboard
     SmartDashboard.putNumber("ShootEnc", shootTurret.getSelectedSensorPosition());
     SmartDashboard.putNumber("Speedval", Speedvalball);
     SmartDashboard.putNumber("Turn Value", Turnvalball);
     SmartDashboard.putNumber("midx 1", midx1);
     SmartDashboard.putNumber("midx 2", midx2);
-    SmartDashboard.putNumber("Cam", camnum);
+    SmartDashboard.putNumber("cam", 0);
+    SmartDashboard.putNumber("TopShootVelocity", shootTopEnc.getVelocity());
+    SmartDashboard.putNumber("BottomShootVelocity", shootBottomEnc.getVelocity());
 
+    //calculates the timer for the drive and prediction
     if(t < 51){
       t++;
     }
