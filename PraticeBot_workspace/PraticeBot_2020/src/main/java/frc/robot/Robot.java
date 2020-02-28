@@ -368,13 +368,13 @@ public class Robot extends TimedRobot {
       shootTurret.set(0);
 
       //start a counter
-      if(s < 30){
-        s++;
+      if(shootBottomEnc.getVelocity() > 4200 && shootTopEnc.getVelocity() > 4200){
+        sequencer.set(0.5);
       }
 
       else{
         //if the timer has passed spin the sequencer
-        sequencer.set(0.5);
+        sequencer.set(0);
         
       }
 
@@ -415,8 +415,12 @@ public class Robot extends TimedRobot {
     }
 
     //turn the sequencer off
-    if(!spStick.getRawButton(2) || !spStick.getRawButton(12) || !spStick.getRawButton(11)){
+    if(!spStick.getRawButton(2) && !spStick.getRawButton(12) && !spStick.getRawButton(11) && !spStick.getRawButton(1)){
       sequencer.set(0);
+    }
+
+    if(!spStick.getRawButton(12) && !spStick.getRawButton(11) && !spStick.getRawButton(1)){
+      kicker.set(0);
     }
 
 
@@ -424,6 +428,7 @@ public class Robot extends TimedRobot {
 
     //If you press 1 you vision good
     if(drStick.getRawButton(1)){
+      SmartDashboard.putNumber("cam", 1);
 
       //Make sure it has a ball
       if(Visionclass.compareTo("ball") >= 0){
@@ -502,6 +507,7 @@ public class Robot extends TimedRobot {
   }
   //if your not activating vision you can drive nic and corey
   else{
+    SmartDashboard.putNumber("cam", 0);
     drive.arcadeDrive(drStick.getY(), -drStick.getZ());
   }
     
@@ -511,7 +517,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Turn Value", Turnvalball);
     SmartDashboard.putNumber("midx 1", midx1);
     SmartDashboard.putNumber("midx 2", midx2);
-    SmartDashboard.putNumber("cam", 0);
     SmartDashboard.putNumber("TopShootVelocity", shootTopEnc.getVelocity());
     SmartDashboard.putNumber("BottomShootVelocity", shootBottomEnc.getVelocity());
 
