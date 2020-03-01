@@ -73,7 +73,7 @@ public class Functions {
           }
           else if(robot.size < 200 && robot.size != 0){
 
-            if(robot.distoff < 8 && robot.distoff > -8){
+            if(robot.distoff < 7 && robot.distoff > -7){
                 robot.Turnvaltar = 0;
             }
 
