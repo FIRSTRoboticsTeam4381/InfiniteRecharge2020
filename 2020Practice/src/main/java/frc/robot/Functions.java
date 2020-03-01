@@ -58,10 +58,186 @@ public class Functions {
             }
     }
 
-    public static void Target(){
+    public static void inbetweenTarget(){
+        if(robot.size > 200 && robot.size != 0){
+
+            if(robot.distoff < 270 && robot.distoff > 370){
+              robot.Turnvaltar = 0;
+            }
+
+            else{
+                robot.Turnvaltar = (0.003125 * robot.distoff);  
+                robot.Turnvaltar = robot.Turnvaltar * 0.3;
+            }
+
+          }
+          else if(robot.size < 200 && robot.size != 0){
+
+            if(robot.distoff < 270 && robot.distoff > 370){
+                robot.Turnvaltar = 0;
+            }
+
+            else{
+                robot.Turnvaltar = (0.003125 * robot.distoff);  
+                robot.Turnvaltar = robot.Turnvaltar * 0.3;
+              }
+
+          }
+    } 
+    
+    public static void pastRightTarget(){
+        if(robot.Turnvaltar > 0){
+
+            if(robot.size > 200 && robot.size != 0){
+
+              if(robot.distoff < 270 && robot.distoff  > 370){
+                robot.Turnvaltar = 0;
+              }
+              else{
+                robot.Turnvaltar = (0.003125 * robot.distoff );  
+                robot.Turnvaltar = robot.Turnvaltar * 0.4;
+              }
+
+            }
+
+            else if(robot.size < 200 && robot.size != 0){
+
+              if(robot.distoff  < 270 && robot.distoff  > 370){
+                robot.Turnvaltar = 0;
+              }
+
+            else{
+                robot.Turnvaltar = (0.003125 * robot.distoff);  
+                robot.Turnvaltar = robot.Turnvaltar * 0.4;
+              }
+
+            }
+          }
+
+        else{
+                robot.Turnvaltar = 0;
+            }
+    }
+
+    public static void pastLeftTarget(){
+        if(robot.Turnvaltar < 0){
+
+            if(robot.size > 200 && robot.size != 0){
+
+              if(robot.distoff < 250 && robot.distoff > 390){
+                robot.Turnvaltar = 0;
+              }
+
+              else{
+                robot.Turnvaltar = (0.003125 * robot.distoff);  
+                robot.Turnvaltar = robot.Turnvaltar * 0.4;
+              }
+
+            }
+
+            else if(robot.size < 200 && robot.size != 0){
+
+              if(robot.distoff < 270 && robot.distoff > 370){
+                robot.Turnvaltar = 0;
+              }
+
+              else{
+                robot.Turnvaltar = (0.003125 * robot.distoff);  
+                robot.Turnvaltar = robot.Turnvaltar * 0.4;
+              }
+
+            }
+
+          }
+          else{
+            robot.Turnvaltar = 0;
+          }
+    }
+
+    public static void TurnBallVision(){
+        //calulates the turn value of the robot
+        if(robot.distoff > 0){
+            //subtract the offset - Make sure you have the correct value!!!
+            robot.distoff = robot.distoff - robot.offset;
+          }
+  
+          else{
+            robot.distoff = robot.distoff + robot.offset;
+          }
+    
+          if(robot.midx1 == 0){
+            robot.midx2 = 0;
+            robot.i = false;
+            robot.t = 0;
+          }
+          else{
+            robot.midx2 = robot.midx1 - robot.midx2; 
+          }
+    
+          if(robot.size > 200 && robot.size != 0){
+            if(robot.distoff < 270 && robot.distoff > 370){
+              robot.Turnvalball = 0;
+            }
+  
+            else{
+                robot.Turnvalball = (0.003125 * robot.distoff);  
+                robot.Turnvalball = robot.Turnvalball * 0.6;
+            }
+  
+          }
+  
+          else if(robot.size < 200 && robot.size != 0){
+  
+            if(robot.distoff < 300 && robot.distoff > 340){
+                robot.Turnvalball = 0;
+            }
+  
+            else{
+              if(robot.midx2 > 20 || robot.midx2 < -20){
+                robot.Turnvalball = (0.003125 * robot.distoff);  
+                robot.Turnvalball = robot.Turnvalball * .8;
+                robot.Turnvalball = robot.Turnvalball * -1;
+              }
+  
+              else if(robot.t > 51){
+                robot.Turnvalball = (0.003125 * robot.distoff);  
+                robot.Turnvalball = robot.Turnvalball * 0.6;
+              }
+            }
+          }
+          else{
+            robot.Turnvalball = 0;
+          }
+    }
+
+    public static void SpeedBallVision(){
+        //Calulates the speed value of the robot
+        if(robot.size == 0){
+            robot.Speedvalball = 0;
+          }
+          else{
+            if(robot.t < 51){
+              robot.Speedvalball = ((-0.003125) * robot.size) + 1;
+              robot.Speedvalball = robot.Speedvalball * 0.85;
+            }
+            else{
+              robot.Speedvalball = ((-0.003125) * robot.size) + 1;
+            }
+          }
+    }
+
+    public static void TargetAuton(){
         robot.stage++;
     }
 
+    public static void TargetTel(){
+        
+    }
+
+    public static void TeleShoot(){
+        robot.indexPID.setReference(8.5, ControlType.kPosition);
+    }
+    
 
 
 }
