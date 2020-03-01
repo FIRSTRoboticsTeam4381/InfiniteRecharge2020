@@ -62,10 +62,6 @@ public class Functions {
         robot.stage++;
     }
 
-    public static void TeleShoot(){
-        robot.indexPID.setReference(8.5, ControlType.kPosition);
-    }
-    
 
 
 }

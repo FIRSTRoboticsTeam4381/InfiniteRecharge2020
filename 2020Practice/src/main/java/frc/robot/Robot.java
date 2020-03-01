@@ -124,6 +124,7 @@ public class Robot extends TimedRobot {
   public int tempRight;
   public double indexIncrement = 8.5;
   public boolean shoot = false;
+  public double tempShoot = 0;
   public AHRS ahrs;
 
   /**1
@@ -460,23 +461,23 @@ public class Robot extends TimedRobot {
 
     //Shooter rev up
     if(spStick.getRawButton(1)){
+      if(!(sequenceEnc.getPosition() % 8.5 <= 0.05) && sequencer.get() < 0.2){
+        indexPID.setReference(8.5,ControlType.kPosition);
+      }else{
       kicker.set(-1);
+      }
       //0.88
-      botWheelPID.setReference(0.88, ControlType.kDutyCycle);
-      topWheelPID.setReference(0.88, ControlType.kDutyCycle);
+      //botWheelPID.setReference(0.88, ControlType.kDutyCycle);
+      //topWheelPID.setReference(0.88, ControlType.kDutyCycle);
       shootTurret.set(0);
-
+      
       if(spStick.getPOV() == 180){
         sequencer.set(0.2);
+        kicker.set(-1);
       }else if(spStick.getPOV() == 0){
         sequencer.set(0.7);
+        kicker.set(-1);
       }
-
-      else{
-        sequencer.set(0);
-        
-      }
-
     }
     else{
       kicker.set(0);
@@ -618,15 +619,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("left1Enc", l1.getSelectedSensorPosition());
     SmartDashboard.putNumber("right1Enc", r1.getSelectedSensorPosition());
     SmartDashboard.putNumber("Angle", ahrs.getAngle());
-
-
-
-
-    if(drStick.getRawButton(10)){
-      Functions.TeleShoot();
-    }
-    
-
 
 
     //calculates the timer for the drive and prediction
