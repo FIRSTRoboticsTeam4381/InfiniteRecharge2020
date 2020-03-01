@@ -180,7 +180,7 @@ public class Robot extends TimedRobot {
     indexPID.setD(sD);
     indexPID.setIZone(sIz);
     indexPID.setFF(sFF);
-    indexPID.setOutputRange(-0.3, 0.3);
+    indexPID.setOutputRange(-0.5, 0.5);
 
     kicker = new WPI_VictorSPX(7);
     
@@ -380,29 +380,33 @@ public class Robot extends TimedRobot {
 
     //Shooter rev up
     if(spStick.getRawButton(1)){
-      if(!(sequenceEnc.getPosition() % 8.5 <= 0.05) && sequencer.get() < 0.2){
-        indexPID.setReference(8.5,ControlType.kPosition);
+      if(shoot){
+        tempShoot = sequenceEnc.getPosition() -
+         sequenceEnc.getPosition() % 8.5;
+        shoot = false;
+      }
+      if(!(sequenceEnc.getPosition() % 8.5 <= 0.1) && !(sequencer.get() < 0.1 && sequencer.get() > 0.1)){
+        indexPID.setReference(tempShoot,ControlType.kPosition);
       }else{
-      kicker.set(-1);
+        indexPID.setReference(tempShoot,ControlType.kPosition);
+        kicker.set(-1);
       }
       //0.88
-      //botWheelPID.setReference(0.88, ControlType.kDutyCycle);
-      //topWheelPID.setReference(0.88, ControlType.kDutyCycle);
+      botWheelPID.setReference(1, ControlType.kDutyCycle);
+      topWheelPID.setReference(1, ControlType.kDutyCycle);
       shootTurret.set(0);
       
-      if(spStick.getPOV() == 180){
-        sequencer.set(0.2);
-        kicker.set(-1);
-      }else if(spStick.getPOV() == 0){
-        sequencer.set(0.7);
-        kicker.set(-1);
+      if(shootTopEnc.getVelocity() > 3800 && shootBottomEnc.getVelocity() > 3800){
+        tempShoot += 0.5;
       }
+      
     }
     else{
       //kicker.set(0);
       shootTop.set(0);
       shootBottom.set(0);
-    }
+      shoot = true;
+        }
     
     //ball stuck get out of da robot you goofy goober
     if(spStick.getRawButton(12) || spStick.getRawButton(11)){

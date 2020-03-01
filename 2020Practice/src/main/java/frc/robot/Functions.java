@@ -73,13 +73,13 @@ public class Functions {
           }
           else if(robot.size < 200 && robot.size != 0){
 
-            if(robot.distoff < 270 && robot.distoff > 370){
+            if(robot.distoff < 8 && robot.distoff > -8){
                 robot.Turnvaltar = 0;
             }
 
             else{
                 robot.Turnvaltar = (0.003125 * robot.distoff);  
-                robot.Turnvaltar = robot.Turnvaltar * 0.3;
+                robot.Turnvaltar = robot.Turnvaltar * 0.6;
               }
 
           }
@@ -95,20 +95,20 @@ public class Functions {
               }
               else{
                 robot.Turnvaltar = (0.003125 * robot.distoff );  
-                robot.Turnvaltar = robot.Turnvaltar * 0.4;
+                robot.Turnvaltar = robot.Turnvaltar * 0.5;
               }
 
             }
 
             else if(robot.size < 200 && robot.size != 0){
 
-              if(robot.distoff  < 270 && robot.distoff  > 370){
+              if(robot.distoff  < 5 && robot.distoff  > -5){
                 robot.Turnvaltar = 0;
               }
 
             else{
                 robot.Turnvaltar = (0.003125 * robot.distoff);  
-                robot.Turnvaltar = robot.Turnvaltar * 0.4;
+                robot.Turnvaltar = robot.Turnvaltar * 0.8;
               }
 
             }
