@@ -59,6 +59,16 @@ public class Functions {
     }
 
     public static void inbetweenTarget(){
+
+        if(robot.distoff > 0){
+            //subtract the offset - Make sure you have the correct value!!!
+            robot.distoff = robot.distoff - robot.offset;
+        }
+  
+        else{
+            robot.distoff = robot.distoff + robot.offset;
+        }
+
         if(robot.size > 200 && robot.size != 0){
 
             if(robot.distoff < 270 && robot.distoff > 370){
@@ -73,13 +83,13 @@ public class Functions {
           }
           else if(robot.size < 200 && robot.size != 0){
 
-            if(robot.distoff < 7 && robot.distoff > -7){
+            if(robot.distoff < 10 && robot.distoff > -10){
                 robot.Turnvaltar = 0;
             }
 
             else{
                 robot.Turnvaltar = (0.003125 * robot.distoff);  
-                robot.Turnvaltar = robot.Turnvaltar * 0.6;
+                robot.Turnvaltar = robot.Turnvaltar * 0.35;
               }
 
           }

@@ -75,7 +75,7 @@ public class Robot extends TimedRobot {
   public double midx2 = 0;
   private double tensortime = 0;
 
-  public double offset = 0; //Change Offsett value
+  public double offset = 15; //Change Offsett value
 
   public int t = 0;
   public boolean i = false;
@@ -395,12 +395,16 @@ public class Robot extends TimedRobot {
         kicker.set(-1);
       }
       //0.88
-      botWheelPID.setReference(1, ControlType.kDutyCycle);
-      topWheelPID.setReference(1, ControlType.kDutyCycle);
+      botWheelPID.setReference(0.88, ControlType.kDutyCycle);
+      topWheelPID.setReference(0.88, ControlType.kDutyCycle);
       shootTurret.set(0);
       
-      if(shootTopEnc.getVelocity() > 3800 && shootBottomEnc.getVelocity() > 3800){
-        tempShoot += 0.5;
+      if(drStick.getRawButton(4)){
+        tempShoot += 8.5;
+      }
+
+      if(shootTopEnc.getVelocity() > 4100 && shootBottomEnc.getVelocity() > 4100){
+        tempShoot += 0.2;
       }
       
     }
