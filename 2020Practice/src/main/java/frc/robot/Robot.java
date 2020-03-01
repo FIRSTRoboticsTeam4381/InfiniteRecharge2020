@@ -65,28 +65,29 @@ public class Robot extends TimedRobot {
 
   public WPI_TalonSRX spool;
 
-  private double distoff = 0;
-  private double size = 0;
-  private double midx1 = 0;
-  private double midx2 = 0;
+
+  //Vision vars
+  public double distoff = 0;
+  public double size = 0;
+  public double midx1 = 0;
+  public double midx2 = 0;
   private double tensortime = 0;
 
-  private double offset = 75; //Change Offsett value
+  public double offset = 0; //Change Offsett value
 
-  private int t = 0;
-  private int s = 0;
-  private boolean i = false;
+  public int t = 0;
+  public boolean i = false;
 
   private String Visionclass;
 
-  private double Turnvalball = 0;
-  private double Speedvalball = 0;
+  public double Turnvalball = 0;
+  public double Speedvalball = 0;
 
   private double camnum = 0;
 
-  private double Turnvaltar = 0;
-  private double Speedvaltar = 0;
+  public double Turnvaltar = 0;
 
+//Joysticks
   private Joystick drStick = new Joystick(0);
   private Joystick spStick = new Joystick(1);
   private DifferentialDrive drive;
@@ -248,7 +249,7 @@ public class Robot extends TimedRobot {
       Functions.DriveTo(82000, false);
       break;
       case 2:
-      Functions.Target();
+      Functions.TargetAuton();
       break;
       case 3:
       Functions.AutoShoot(4400, 4400, 0.7);
@@ -266,7 +267,7 @@ public class Robot extends TimedRobot {
       Functions.DriveTo(82000, true);
       break;
       case 8:
-      Functions.Target();
+      Functions.TargetAuton();
       break;
       case 9  :
       Functions.AutoShoot(4000, 4000, 0.2);
@@ -304,107 +305,23 @@ public class Robot extends TimedRobot {
     //Specials stuff
 
     //Vision target, if the button is pressed vision kicks in
-    if(spStick.getRawButton(7)){
+    if(spStick.getRawButton(3) || spStick.getRawButton(5)){
       //SmartDashboard.putNumber("cam", 0);
       if(Visionclass.compareTo("Target") >= 0){
 
         if((shootTurret.getSelectedSensorPosition() < lStop && shootTurret.getSelectedSensorPosition() > rStop)){
-
-          if(size > 200 && size != 0){
-
-            if(distoff < 270 && distoff > 370){
-              Turnvaltar = 0;
-            }
-
-            else{
-              Turnvaltar = (0.003125 * distoff);  
-              Turnvaltar = Turnvaltar * 0.3;
-            }
-
-          }
-          else if(size < 200 && size != 0){
-
-            if(distoff < 270 && distoff > 370){
-              Turnvaltar = 0;
-            }
-
-            else{
-                Turnvaltar = (0.003125 * distoff);  
-                Turnvaltar = Turnvaltar * 0.3;
-              }
-
-          }
+          
+          Functions.inbetweenTarget();
+          
         }
         else if(shootTurret.getSelectedSensorPosition() <= rStop){
 
-          if(Turnvaltar > 0){
-
-            if(size > 200 && size != 0){
-
-              if(distoff < 270 && distoff > 370){
-                Turnvaltar = 0;
-              }
-              else{
-                Turnvaltar = (0.003125 * distoff);  
-                Turnvaltar = Turnvaltar * 0.4;
-              }
-
-            }
-
-            else if(size < 200 && size != 0){
-
-              if(distoff < 270 && distoff > 370){
-                Turnvaltar = 0;
-              }
-
-            else{
-              Turnvaltar = (0.003125 * distoff);  
-              Turnvaltar = Turnvaltar * 0.4;
-              }
-
-            }
-          }
-
-          else{
-            Turnvaltar = 0;
-            }
+          Functions.pastRightTarget();
   
         }
 
         else if(shootTurret.getSelectedSensorPosition() >= lStop){
-
-          if(Turnvaltar < 0){
-
-            if(size > 200 && size != 0){
-
-              if(distoff < 250 && distoff > 390){
-                Turnvaltar = 0;
-              }
-
-              else{
-                Turnvaltar = (0.003125 * distoff);  
-                Turnvaltar = Turnvaltar * 0.4;
-              }
-
-            }
-
-            else if(size < 200 && size != 0){
-
-              if(distoff < 270 && distoff > 370){
-                Turnvaltar = 0;
-              }
-
-              else{
-                Turnvaltar = (0.003125 * distoff);  
-                Turnvaltar = Turnvaltar * 0.4;
-              }
-
-            }
-
-          }
-          else{
-            Turnvaltar = 0;
-          }
+          Functions.pastLeftTarget();
 
         }
         
@@ -419,9 +336,9 @@ public class Robot extends TimedRobot {
     else{
 
       //if its inbetween the two positions you can move it either way or you hit button 6 or 7
-      if((shootTurret.getSelectedSensorPosition() < lStop && shootTurret.getSelectedSensorPosition() > rStop) || (spStick.getRawButton(6) || spStick.getRawButton(7))){
+      if((shootTurret.getSelectedSensorPosition() < lStop && shootTurret.getSelectedSensorPosition() > rStop) || (spStick.getRawButton(7) || spStick.getRawButton(8))){
      
-        //shootTurret.set(-spStick.getZ() * 0.3);
+        shootTurret.set(-spStick.getZ() * 0.3);
 
       }
 
@@ -432,7 +349,7 @@ public class Robot extends TimedRobot {
         if(shootTurret.getSelectedSensorPosition() <= rStop){
 
           if(spStick.getZ() < 0){
-            //shootTurret.set(spStick.getZ() *0.3);
+            shootTurret.set(spStick.getZ() *0.3);
           }
 
           else{
@@ -445,7 +362,7 @@ public class Robot extends TimedRobot {
         else if(shootTurret.getSelectedSensorPosition() >= lStop){
 
           if(spStick.getZ() > 0){
-            //shootTurret.set(spStick.getZ() *0.3);
+            shootTurret.set(spStick.getZ() *0.3);
           }
 
           else{
@@ -453,7 +370,9 @@ public class Robot extends TimedRobot {
           }
 
         }
+
       }
+
     }
 
 
@@ -479,10 +398,9 @@ public class Robot extends TimedRobot {
 
     }
     else{
-      kicker.set(0);
+      //kicker.set(0);
       shootTop.set(0);
       shootBottom.set(0);
-      s = 0;
     }
     
     //ball stuck get out of da robot you goofy goober
@@ -496,8 +414,12 @@ public class Robot extends TimedRobot {
       Intake.set(0);
     }
 
+    if(spStick.getRawButton(10)){
+      kicker.set(.2);
+    }
+
     //Spool to pick up the arm so we fit ;)
-    if(spStick.getRawButton(8)){
+    if(spStick.getRawButton(12)){
       spool.set(.5);
     }
     else{
@@ -509,13 +431,21 @@ public class Robot extends TimedRobot {
       Intake.set(-1);
       sequencer.set(0.2);
     }
+    //outtake the ball
+    else if(spStick.getRawButton(9)){
+        Intake.set(.5);
+      }
     else{
-      Intake.set(0);
-    }
+        Intake.set(0);
+      }
 
     //turn the sequencer off
     if(!spStick.getRawButton(2) && !spStick.getRawButton(12) && !spStick.getRawButton(11) && !spStick.getRawButton(1)){
       sequencer.set(0);
+    }
+
+    if(!spStick.getRawButton(10) && !spStick.getRawButton(12) && !spStick.getRawButton(11) && !spStick.getRawButton(1)){
+      kicker.set(0);
     }
 
 
@@ -528,73 +458,9 @@ public class Robot extends TimedRobot {
       //Make sure it has a ball
       if(Visionclass.compareTo("ball") >= 0){
 
-        //calulates the turn value of the robot
-        if(distoff > 0){
-          //subtract the offset - Make sure you have the correct value!!!
-          distoff = distoff - offset;
-        }
-
-        else{
-          distoff = distoff + offset;
-        }
+        Functions.TurnBallVision();
   
-        if(midx1 == 0){
-          midx2 = 0;
-          i = false;
-          t = 0;
-        }
-        else{
-          midx2 = midx1 - midx2; 
-        }
-  
-        if(size > 200 && size != 0){
-          if(distoff < 270 && distoff > 370){
-            Turnvalball = 0;
-          }
-
-          else{
-            Turnvalball = (0.003125 * distoff);  
-            Turnvalball = Turnvalball * 0.6;
-          }
-
-        }
-
-        else if(size < 200 && size != 0){
-
-          if(distoff < 300 && distoff > 340){
-            Turnvalball = 0;
-          }
-
-          else{
-            if(midx2 > 20 || midx2 < -20){
-              Turnvalball = (0.003125 * distoff);  
-              Turnvalball = Turnvalball * .8;
-              Turnvalball = Turnvalball * -1;
-            }
-
-            else if(t > 51){
-              Turnvalball = (0.003125 * distoff);  
-              Turnvalball = Turnvalball * 0.6;
-            }
-          }
-        }
-        else{
-          Turnvalball = 0;
-        }
-  
-        //Calulates the speed value of the robot
-        if(size == 0){
-          Speedvalball = 0;
-        }
-        else{
-          if(t < 51){
-            Speedvalball = ((-0.003125) * size) + 1;
-            Speedvalball = Speedvalball * 0.85;
-          }
-          else{
-            Speedvalball = ((-0.003125) * size) + 1;
-          }
-        }
+        Functions.SpeedBallVision();
 
         //actually drive to the robot
         drive.arcadeDrive(Speedvalball, Turnvalball);
@@ -636,9 +502,6 @@ public class Robot extends TimedRobot {
     else{
       i = true;
     }
-
-
-
   }
 
   /**
