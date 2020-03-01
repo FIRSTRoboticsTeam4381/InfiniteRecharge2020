@@ -56,6 +56,8 @@ public class Robot extends TimedRobot {
   public WPI_VictorSPX r2;
   public WPI_VictorSPX l2;
 
+  public WPI_TalonSRX climb;
+
   //public WPI_TalonSRX ControlPanel;
   public WPI_TalonSRX r1;
   public WPI_TalonSRX l1;
@@ -184,6 +186,7 @@ public class Robot extends TimedRobot {
 
     kicker = new WPI_VictorSPX(7);
     
+    climb = new WPI_TalonSRX(0); //CHANGE
 
     //PickupArm = new WPI_TalonSRX(1);
     Intake = new WPI_VictorSPX(2);
@@ -443,6 +446,16 @@ public class Robot extends TimedRobot {
     else{
         Intake.set(0);
       }
+
+    if(spStick.getRawButton(4)){
+      climb.set(.5);
+    }
+    else if(spStick.getRawButton(6)){
+      climb.set(-.5);
+    }
+    else{
+      climb.set(0);
+    }
 
     //turn the sequencer off
     if(!spStick.getRawButton(2) && !spStick.getRawButton(12) && !spStick.getRawButton(11) && !spStick.getRawButton(1)){
