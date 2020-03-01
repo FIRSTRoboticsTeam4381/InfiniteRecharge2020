@@ -49,6 +49,7 @@ public class Robot extends TimedRobot {
   public CANEncoder shootBottomEnc;
   public CANEncoder sequenceEnc;
   //public SparkMax HandleDrive;
+  public CANPIDController indexPID;
 
   public WPI_VictorSPX kicker;
   public WPI_VictorSPX Intake;
@@ -106,6 +107,14 @@ public class Robot extends TimedRobot {
   private double kMaxOutput = 1;
   private double kMinOutput = -1;
 
+  private double sP = 0.1;
+  private double sI = 1e-4;
+  private double sD = 1;
+  private double sIz = 0;
+  private double sFF = 0;
+  private double sMaxOutput = 1;
+  private double sMinOutput = -1;
+
   public CANPIDController topWheelPID;
   public CANPIDController botWheelPID;
 
@@ -113,7 +122,8 @@ public class Robot extends TimedRobot {
   public int stage = 1;
   public int tempLeft;
   public int tempRight;
-
+  public double indexIncrement = 8.5;
+  public boolean shoot = false;
   public AHRS ahrs;
 
   /**1
@@ -158,10 +168,20 @@ public class Robot extends TimedRobot {
     topWheelPID.setFF(kFF);
     topWheelPID.setOutputRange(kMinOutput, kMaxOutput);
     
-    kicker = new WPI_VictorSPX(7);
     sequencer = new CANSparkMax(46, MotorType.kBrushless);
     sequencer.setIdleMode(IdleMode.kCoast);
     sequenceEnc = new CANEncoder(sequencer);
+
+    indexPID = sequencer.getPIDController();
+    indexPID.setP(sP);
+    indexPID.setI(sI);
+    indexPID.setD(sD);
+    indexPID.setIZone(sIz);
+    indexPID.setFF(sFF);
+    indexPID.setOutputRange(-0.3, 0.3);
+
+    kicker = new WPI_VictorSPX(7);
+    
 
     //PickupArm = new WPI_TalonSRX(1);
     Intake = new WPI_VictorSPX(2);
@@ -176,6 +196,8 @@ public class Robot extends TimedRobot {
     r1.configPeakCurrentLimit(30);
     l1.configPeakCurrentLimit(30);
     sequenceEnc.setPosition(0);
+
+    
     ahrs.reset();
   }
 
@@ -229,7 +251,7 @@ public class Robot extends TimedRobot {
       Functions.Target();
       break;
       case 3:
-      Functions.Shoot(4400, 4400, 0.7);
+      Functions.AutoShoot(4400, 4400, 0.7);
       break;
       case 4:
       Functions.TurnTo(-90);
@@ -247,7 +269,7 @@ public class Robot extends TimedRobot {
       Functions.Target();
       break;
       case 9  :
-      Functions.Shoot(4000, 4000, 0.2);
+      Functions.AutoShoot(4000, 4000, 0.2);
       default:
       r1.setNeutralMode(NeutralMode.Coast);
       l1.setNeutralMode(NeutralMode.Coast);
@@ -269,7 +291,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     if(drStick.getRawButton(11)){
-      ahrs.reset();
+      //ahrs.reset();
+      sequenceEnc.setPosition(0);
     }
     //This gets all the numbers we need from the smart dashboard
     distoff = SmartDashboard.getNumber("distance off", 0);
@@ -599,8 +622,10 @@ public class Robot extends TimedRobot {
 
 
 
-
-
+    if(drStick.getRawButton(10)){
+      Functions.TeleShoot();
+    }
+    
 
 
 

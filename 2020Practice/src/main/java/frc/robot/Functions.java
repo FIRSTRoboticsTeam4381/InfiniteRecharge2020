@@ -23,7 +23,7 @@ public class Functions {
          }
       }
     
-      public static void Shoot(double sbVel, double stVel, double indexVel) {
+      public static void AutoShoot(double sbVel, double stVel, double indexVel) {
         
         robot.botWheelPID.setReference(1, ControlType.kDutyCycle);
         robot.topWheelPID.setReference(1, ControlType.kDutyCycle);
@@ -61,6 +61,11 @@ public class Functions {
     public static void Target(){
         robot.stage++;
     }
+
+    public static void TeleShoot(){
+        robot.indexPID.setReference(8.5, ControlType.kPosition);
+    }
+    
 
 
 }
