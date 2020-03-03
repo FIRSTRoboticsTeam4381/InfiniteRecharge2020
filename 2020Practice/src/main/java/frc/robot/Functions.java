@@ -1,24 +1,27 @@
 package frc.robot;
 import com.revrobotics.ControlType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Functions {
 
     public static Robot robot;
 
-    public static void DriveTo(int pos, boolean pickBall) {
+    public static void DriveTo(int pos, boolean pickBall, double speed) {
         if(Math.abs(Math.abs(robot.l1.getSelectedSensorPosition()) - Math.abs(robot.tempLeft)) < pos
          && Math.abs(Math.abs(robot.r1.getSelectedSensorPosition()) - Math.abs(robot.tempRight)) < pos){
            if(pickBall){
                robot.Intake.set(-1);
                robot.sequencer.set(0.2);
            }
-           robot.r1.set(0.2);
-           robot.l1.set(-0.2);
+           robot.r1.set(speed);
+           robot.l1.set(-speed);
          }else{
             robot.Intake.set(0);
             robot.sequencer.set(0);
             robot.r1.set(0);
             robot.l1.set(0);
+            robot.tempLeft = robot.l1.getSelectedSensorPosition();
+            robot.tempRight = robot.r1.getSelectedSensorPosition();
             robot.stage++; 
          }
       }
@@ -31,13 +34,14 @@ public class Functions {
         if(robot.shootBottomEnc.getVelocity() < sbVel && robot.shootTopEnc.getVelocity() < stVel){
             //Wait
         }else{
-            if(robot.sequenceEnc.getPosition() < 68){
+            if(robot.sequenceEnc.getPosition() < 68 + robot.tempAutoShoot){
                 robot.sequencer.set(indexVel);
             }else{
                 robot.sequencer.set(0);
                 robot.shootTop.set(0);
                 robot.shootBottom.set(0);
                 robot.kicker.set(0);
+                robot.tempAutoShoot = robot.sequenceEnc.getPosition();
                 robot.stage++;
             }
     }
@@ -51,9 +55,11 @@ public class Functions {
             }else if(robot.ahrs.getAngle() < deg - 3){
                 robot.l1.set(-0.2);
                 robot.r1.set(-0.2);
-            }else if(robot.l1.get() == 0 && robot.r1.get() == 0){
+            }else{
                 robot.l1.set(0);
                 robot.r1.set(0);
+                robot.tempLeft = robot.l1.getSelectedSensorPosition();
+                robot.tempRight = robot.r1.getSelectedSensorPosition();
                 robot.stage++;
             }
     }
@@ -184,6 +190,7 @@ public class Functions {
 
     public static void TurnBallVision(){
         //calulates the turn value of the robot
+        robot.imhere = true;
         if(robot.distoff > 0){
             //subtract the offset - Make sure you have the correct value!!!
             robot.distoff = robot.distoff - robot.offset;
@@ -255,23 +262,26 @@ public class Functions {
     }
 
     public static void TargetAuton(){
-      if(robot.distoff > 0){
+      robot.Visionclass = SmartDashboard.getString("class", "");
+      robot.distoff = SmartDashboard.getNumber("distance off", 0);
+      /*if(robot.distoff > 0){
         //subtract the offset - Make sure you have the correct value!!!
         robot.distoff = robot.distoff - robot.offset;
       }
 
       else{
         robot.distoff = robot.distoff + robot.offset;
-      }
-      if(!(robot.distoff <= 10 && robot.distoff >= -10)){
+      }*/
+
+      if(robot.distoff >= 10 || robot.distoff <= -10){
         if(robot.Visionclass.compareTo("Target") >= 0){
           robot.Turnvaltar = (0.003125 * robot.distoff);  
-          robot.Turnvaltar = robot.Turnvaltar * 0.35;
-        }else{
-          robot.Turnvaltar = 0;
+          robot.Turnvaltar = robot.Turnvaltar * 0.25;
         }
+        robot.shootTurret.set(-robot.Turnvaltar);
       }
       else{
+        robot.Turnvaltar = 0;
         robot.stage++;
       }
     }

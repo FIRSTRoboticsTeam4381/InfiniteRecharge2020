@@ -81,6 +81,7 @@ public class Robot extends TimedRobot {
 
   public int t = 0;
   public boolean i = false;
+  public boolean imhere = false;
 
   public String Visionclass;
 
@@ -127,6 +128,7 @@ public class Robot extends TimedRobot {
   public int stage = 1;
   public int tempLeft;
   public int tempRight;
+  public double tempAutoShoot;
   public double indexIncrement = 8.5;
   public boolean shoot = false;
   public double tempShoot = 0;
@@ -242,6 +244,7 @@ public class Robot extends TimedRobot {
     l2.setNeutralMode(NeutralMode.Brake);
     tempRight = r1.getSelectedSensorPosition();
     tempLeft = l1.getSelectedSensorPosition();
+    tempAutoShoot = sequenceEnc.getPosition();
     ahrs.reset();
   }
 
@@ -250,12 +253,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {  
+    SmartDashboard.putBoolean("Vision went?", imhere);
     switch(stage){
       case 1:
-      Functions.DriveTo(10000, false);
+      Functions.DriveTo(100000, false, 0.2);
       break;
       case 2:
       Functions.TargetAuton();
+      SmartDashboard.putBoolean("Vision went?", imhere);
       break;
       case 3:
       Functions.AutoShoot(4400, 4400, 0.7);
@@ -264,20 +269,20 @@ public class Robot extends TimedRobot {
       Functions.TurnTo(-90);
       break;
       case 5:
-      Functions.DriveTo(60000, false);
+      Functions.DriveTo(84000, false, 0.2);
       break;
-      /*case 6:
-      Functions.TurnTo(0);
+      case 6:
+      Functions.TurnTo(-3);
       break;
       case 7:
-      Functions.DriveTo(82000, true);
+      Functions.DriveTo(180000, true, 0.3);
       break;
       case 8:
       Functions.TargetAuton();
       break;
-      case 9  :
-      Functions.AutoShoot(4000, 4000, 0.2);
-     */ default:
+      case 9:
+      Functions.AutoShoot(4400, 4400, 0.2);
+      default:
       r1.setNeutralMode(NeutralMode.Coast);
       l1.setNeutralMode(NeutralMode.Coast);
       r2.setNeutralMode(NeutralMode.Coast);
