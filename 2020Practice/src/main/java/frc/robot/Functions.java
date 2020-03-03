@@ -263,7 +263,7 @@ public class Functions {
       else{
         robot.distoff = robot.distoff + robot.offset;
       }
-      while(!(robot.distoff <= 10 && robot.distoff >= -10)){
+      if(!(robot.distoff <= 10 && robot.distoff >= -10)){
         if(robot.Visionclass.compareTo("Target") >= 0){
           robot.Turnvaltar = (0.003125 * robot.distoff);  
           robot.Turnvaltar = robot.Turnvaltar * 0.35;
@@ -271,7 +271,9 @@ public class Functions {
           robot.Turnvaltar = 0;
         }
       }
+      else{
         robot.stage++;
+      }
     }
 
     public static void TeleShoot(){
