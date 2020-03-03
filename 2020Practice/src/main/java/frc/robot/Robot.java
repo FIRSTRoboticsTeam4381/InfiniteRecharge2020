@@ -75,12 +75,14 @@ public class Robot extends TimedRobot {
   public double midx2 = 0;
   private double tensortime = 0;
 
-  public double offset = 15; //Change Offsett value
+  public double offset = 3; //Change Offsett value
+
+  public double sizeCheck = 100;
 
   public int t = 0;
   public boolean i = false;
 
-  private String Visionclass;
+  public String Visionclass;
 
   public double Turnvalball = 0;
   public double Speedvalball = 0;
