@@ -250,7 +250,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {  
     switch(stage){
       case 1:
-      Functions.DriveTo(82000, false);
+      Functions.DriveTo(10000, false);
       break;
       case 2:
       Functions.TargetAuton();
@@ -264,7 +264,7 @@ public class Robot extends TimedRobot {
       case 5:
       Functions.DriveTo(60000, false);
       break;
-      case 6:
+      /*case 6:
       Functions.TurnTo(0);
       break;
       case 7:
@@ -275,7 +275,7 @@ public class Robot extends TimedRobot {
       break;
       case 9  :
       Functions.AutoShoot(4000, 4000, 0.2);
-      default:
+     */ default:
       r1.setNeutralMode(NeutralMode.Coast);
       l1.setNeutralMode(NeutralMode.Coast);
       r2.setNeutralMode(NeutralMode.Coast);

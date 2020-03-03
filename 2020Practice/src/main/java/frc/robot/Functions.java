@@ -46,12 +46,12 @@ public class Functions {
     public static void TurnTo(int deg){
         
             if(robot.ahrs.getAngle() > deg + 3){
-                robot.l1.set(0.3);
-                robot.r1.set(0.3);
+                robot.l1.set(0.2);
+                robot.r1.set(0.2);
             }else if(robot.ahrs.getAngle() < deg - 3){
-                robot.l1.set(-0.3);
-                robot.r1.set(-0.3);
-            }else{
+                robot.l1.set(-0.2);
+                robot.r1.set(-0.2);
+            }else if(robot.l1.get() == 0 && robot.r1.get() == 0){
                 robot.l1.set(0);
                 robot.r1.set(0);
                 robot.stage++;
