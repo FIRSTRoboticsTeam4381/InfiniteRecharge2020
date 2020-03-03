@@ -69,27 +69,27 @@ public class Functions {
             robot.distoff = robot.distoff + robot.offset;
         }
 
-        if(robot.size > 200 && robot.size != 0){
+        if(robot.size > robot.sizeCheck && robot.size != 0){
 
-            if(robot.distoff < 270 && robot.distoff > 370){
+            if(robot.distoff <= 10 && robot.distoff >= -10){
               robot.Turnvaltar = 0;
             }
 
             else{
                 robot.Turnvaltar = (0.003125 * robot.distoff);  
-                robot.Turnvaltar = robot.Turnvaltar * 0.3;
+                robot.Turnvaltar = robot.Turnvaltar * 0.35;
             }
 
           }
-          else if(robot.size < 200 && robot.size != 0){
+          else if(robot.size < robot.sizeCheck && robot.size != 0){
 
-            if(robot.distoff < 10 && robot.distoff > -10){
+            if(robot.distoff <= 5 && robot.distoff >= -5){
                 robot.Turnvaltar = 0;
             }
 
             else{
                 robot.Turnvaltar = (0.003125 * robot.distoff);  
-                robot.Turnvaltar = robot.Turnvaltar * 0.35;
+                robot.Turnvaltar = robot.Turnvaltar * 0.3;
               }
 
           }
@@ -98,30 +98,40 @@ public class Functions {
     public static void pastRightTarget(){
         if(robot.Turnvaltar > 0){
 
-            if(robot.size > 200 && robot.size != 0){
+          if(robot.distoff > 0){
+            //subtract the offset - Make sure you have the correct value!!!
+            robot.distoff = robot.distoff - robot.offset;
+          }
+  
+          else{
+            robot.distoff = robot.distoff + robot.offset;
+          }
 
-              if(robot.distoff < 270 && robot.distoff  > 370){
-                robot.Turnvaltar = 0;
-              }
-              else{
-                robot.Turnvaltar = (0.003125 * robot.distoff );  
-                robot.Turnvaltar = robot.Turnvaltar * 0.5;
-              }
+          if(robot.size > robot.sizeCheck && robot.size != 0){
 
+            if(robot.distoff <= 10 && robot.distoff >= -10){
+              robot.Turnvaltar = 0;
             }
-
-            else if(robot.size < 200 && robot.size != 0){
-
-              if(robot.distoff  < 5 && robot.distoff  > -5){
-                robot.Turnvaltar = 0;
-              }
 
             else{
                 robot.Turnvaltar = (0.003125 * robot.distoff);  
-                robot.Turnvaltar = robot.Turnvaltar * 0.8;
+                robot.Turnvaltar = robot.Turnvaltar * 0.35;
+            }
+
+          }
+          else if(robot.size < robot.sizeCheck && robot.size != 0){
+
+            if(robot.distoff <= 5 && robot.distoff >= -5){
+                robot.Turnvaltar = 0;
+            }
+
+            else{
+                robot.Turnvaltar = (0.003125 * robot.distoff);  
+                robot.Turnvaltar = robot.Turnvaltar * 0.3;
               }
 
             }
+
           }
 
         else{
@@ -132,28 +142,36 @@ public class Functions {
     public static void pastLeftTarget(){
         if(robot.Turnvaltar < 0){
 
-            if(robot.size > 200 && robot.size != 0){
+          if(robot.distoff > 0){
+            //subtract the offset - Make sure you have the correct value!!!
+            robot.distoff = robot.distoff - robot.offset;
+          }
+  
+          else{
+            robot.distoff = robot.distoff + robot.offset;
+          }
 
-              if(robot.distoff < 250 && robot.distoff > 390){
-                robot.Turnvaltar = 0;
-              }
+          if(robot.size > robot.sizeCheck && robot.size != 0){
 
-              else{
-                robot.Turnvaltar = (0.003125 * robot.distoff);  
-                robot.Turnvaltar = robot.Turnvaltar * 0.4;
-              }
-
+            if(robot.distoff <= 10 && robot.distoff >= -10){
+              robot.Turnvaltar = 0;
             }
 
-            else if(robot.size < 200 && robot.size != 0){
-
-              if(robot.distoff < 270 && robot.distoff > 370){
-                robot.Turnvaltar = 0;
-              }
-
-              else{
+            else{
                 robot.Turnvaltar = (0.003125 * robot.distoff);  
-                robot.Turnvaltar = robot.Turnvaltar * 0.4;
+                robot.Turnvaltar = robot.Turnvaltar * 0.35;
+            }
+
+          }
+          else if(robot.size < robot.sizeCheck && robot.size != 0){
+
+            if(robot.distoff <= 5 && robot.distoff >= -5){
+                robot.Turnvaltar = 0;
+            }
+
+            else{
+                robot.Turnvaltar = (0.003125 * robot.distoff);  
+                robot.Turnvaltar = robot.Turnvaltar * 0.3;
               }
 
             }
@@ -184,7 +202,7 @@ public class Functions {
             robot.midx2 = robot.midx1 - robot.midx2; 
           }
     
-          if(robot.size > 200 && robot.size != 0){
+          if(robot.size > robot.sizeCheck && robot.size != 0){
             if(robot.distoff < 270 && robot.distoff > 370){
               robot.Turnvalball = 0;
             }
@@ -237,11 +255,23 @@ public class Functions {
     }
 
     public static void TargetAuton(){
-        robot.stage++;
-    }
+      if(robot.distoff > 0){
+        //subtract the offset - Make sure you have the correct value!!!
+        robot.distoff = robot.distoff - robot.offset;
+      }
 
-    public static void TargetTel(){
-        
+      else{
+        robot.distoff = robot.distoff + robot.offset;
+      }
+      while(!(robot.distoff <= 10 && robot.distoff >= -10)){
+        if(robot.Visionclass.compareTo("Target") >= 0){
+          robot.Turnvaltar = (0.003125 * robot.distoff);  
+          robot.Turnvaltar = robot.Turnvaltar * 0.35;
+        }else{
+          robot.Turnvaltar = 0;
+        }
+      }
+        robot.stage++;
     }
 
     public static void TeleShoot(){
