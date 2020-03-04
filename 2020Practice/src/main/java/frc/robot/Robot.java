@@ -79,7 +79,7 @@ public class Robot extends TimedRobot {
 
   public double sizeCheck = 100;
 
-  public double searchspeed = .3;
+  public double searchspeed = .2;
 
   public int t = 0;
   public boolean i = false;
@@ -261,9 +261,9 @@ public class Robot extends TimedRobot {
       Functions.DriveTo(100000, false, 0.2);
       break;
       case 2:
-      //Functions.TargetAuton();
+      Functions.TargetAuton();
       //SmartDashboard.putBoolean("Vision went?", imhere);
-      stage++;
+      //stage++;
       break;
       case 3:
       Functions.AutoShoot(4400, 4400, 0.7, false);
@@ -275,14 +275,14 @@ public class Robot extends TimedRobot {
       Functions.DriveTo(87500, false, 0.2);
       break;
       case 6:
-      Functions.TurnTo(-3);
+      Functions.TurnTo(0);
       break;
       case 7:
       Functions.DriveTo(180000, true, 0.2);
       break;
       case 8:
-      //Functions.TargetAuton();
-      stage++;
+      Functions.TargetAuton();
+      //stage++;
       break;
       case 9:
       Functions.AutoShoot(4400, 4400, 0.2, true);

@@ -269,13 +269,22 @@ public class Functions {
 
     public static void TargetAuton(){
       robot.Visionclass = SmartDashboard.getString("class", "");
+      SmartDashboard.putNumber("ShootEnc", robot.shootTurret.getSelectedSensorPosition());
+      SmartDashboard.putNumber("TurnVal", robot.Turnvaltar);
       robot.distoff = SmartDashboard.getNumber("distance off", 0);
 
       if(robot.Visionclass.compareTo("Target") >= 0){
         if(robot.distoff >= 10 || robot.distoff <= -10){
         
           robot.Turnvaltar = (0.003125 * robot.distoff);  
-          robot.Turnvaltar = robot.Turnvaltar * 0.25;
+          robot.Turnvaltar = robot.Turnvaltar * 0.5;
+
+          if(robot.Turnvaltar > 0 && robot.Turnvaltar < .1){
+            robot.Turnvaltar = .1;
+          }
+          if(robot.Turnvaltar < 0 && robot.Turnvaltar > -.1){
+            robot.Turnvaltar = -.1;
+          }
 
         }
         else{
@@ -287,13 +296,13 @@ public class Functions {
          robot.Turnvaltar = robot.searchspeed;
       }
 
-      if(robot.shootTurret.getSelectedSensorPosition() >= robot.lStop && robot.Turnvaltar < 0){
+      if(robot.shootTurret.getSelectedSensorPosition() >= robot.lStop && robot.Turnvaltar > 0){
         robot.Turnvaltar = 0;
-        robot.searchspeed = -robot.searchspeed;
+        robot.searchspeed = -Math.abs(robot.searchspeed);
       }
-      if(robot.shootTurret.getSelectedSensorPosition() <= robot.rStop && robot.Turnvaltar > 0){
+      if(robot.shootTurret.getSelectedSensorPosition() <= robot.rStop && robot.Turnvaltar < 0){
         robot.Turnvaltar = 0;
-        robot.searchspeed = -robot.searchspeed;
+        robot.searchspeed = Math.abs(robot.searchspeed);
       }
       robot.shootTurret.set(-robot.Turnvaltar);
     }
