@@ -264,26 +264,32 @@ public class Functions {
     public static void TargetAuton(){
       robot.Visionclass = SmartDashboard.getString("class", "");
       robot.distoff = SmartDashboard.getNumber("distance off", 0);
-      /*if(robot.distoff > 0){
-        //subtract the offset - Make sure you have the correct value!!!
-        robot.distoff = robot.distoff - robot.offset;
-      }
 
-      else{
-        robot.distoff = robot.distoff + robot.offset;
-      }*/
-
-      if(robot.distoff >= 10 || robot.distoff <= -10){
-        if(robot.Visionclass.compareTo("Target") >= 0){
+      if(robot.Visionclass.compareTo("Target") >= 0){
+        if(robot.distoff >= 10 || robot.distoff <= -10){
+        
           robot.Turnvaltar = (0.003125 * robot.distoff);  
           robot.Turnvaltar = robot.Turnvaltar * 0.25;
+
         }
-        robot.shootTurret.set(-robot.Turnvaltar);
+        else{
+          robot.Turnvaltar = 0;
+          robot.stage++;
+        }
       }
       else{
-        robot.Turnvaltar = 0;
-        robot.stage++;
+         robot.Turnvaltar = robot.searchspeed;
       }
+
+      if(robot.shootTurret.getSelectedSensorPosition() >= robot.lStop && robot.Turnvaltar < 0){
+        robot.Turnvaltar = 0;
+        robot.searchspeed = -robot.searchspeed;
+      }
+      if(robot.shootTurret.getSelectedSensorPosition() <= robot.rStop && robot.Turnvaltar > 0){
+        robot.Turnvaltar = 0;
+        robot.searchspeed = -robot.searchspeed;
+      }
+      robot.shootTurret.set(-robot.Turnvaltar);
     }
 
     public static void TeleShoot(){

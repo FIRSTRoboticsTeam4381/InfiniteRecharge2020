@@ -79,6 +79,8 @@ public class Robot extends TimedRobot {
 
   public double sizeCheck = 100;
 
+  public double searchspeed = .3;
+
   public int t = 0;
   public boolean i = false;
   public boolean imhere = false;
@@ -97,8 +99,8 @@ public class Robot extends TimedRobot {
   private Joystick spStick = new Joystick(1);
   private DifferentialDrive drive;
 
-  private int lStop = 50; //CHANGE LATER
-  private int rStop = -31200; //CHANGE LATER
+  public int lStop = 50; //CHANGE LATER
+  public int rStop = -31200; //CHANGE LATER
 
   private double kP = 16;
   private double kI = 1e-4;
