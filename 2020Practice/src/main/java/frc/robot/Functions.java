@@ -2,6 +2,7 @@ package frc.robot;
 import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+
 public class Functions {
 
     public static Robot robot;
@@ -16,26 +17,31 @@ public class Functions {
            robot.r1.set(speed);
            robot.l1.set(-speed);
          }else{
-            robot.Intake.set(0);
             robot.sequencer.set(0);
             robot.r1.set(0);
             robot.l1.set(0);
             robot.tempLeft = robot.l1.getSelectedSensorPosition();
             robot.tempRight = robot.r1.getSelectedSensorPosition();
+            robot.tempAutoShoot = robot.sequenceEnc.getPosition();
             robot.stage++; 
          }
       }
     
-      public static void AutoShoot(double sbVel, double stVel, double indexVel) {
-        
+      public static void AutoShoot(double sbVel, double stVel, double indexVel, boolean time) {
+        if(time){  
+          robot.indexPID.setReference(119, ControlType.kPosition);
+        }
+
         robot.botWheelPID.setReference(1, ControlType.kDutyCycle);
         robot.topWheelPID.setReference(1, ControlType.kDutyCycle);
+        if(robot.sequenceEnc.getPosition() % 8.5 < 0.05){
         robot.kicker.set(-1);
+        }
         if(robot.shootBottomEnc.getVelocity() < sbVel && robot.shootTopEnc.getVelocity() < stVel){
-            //Wait
+          
         }else{
-            if(robot.sequenceEnc.getPosition() < 68 + robot.tempAutoShoot){
-                robot.sequencer.set(indexVel);
+            if(robot.sequenceEnc.getPosition() < 59.5 + robot.tempAutoShoot){
+               robot.sequencer.set(indexVel);
             }else{
                 robot.sequencer.set(0);
                 robot.shootTop.set(0);

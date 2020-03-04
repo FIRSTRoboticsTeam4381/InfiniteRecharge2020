@@ -259,30 +259,34 @@ public class Robot extends TimedRobot {
       Functions.DriveTo(100000, false, 0.2);
       break;
       case 2:
-      Functions.TargetAuton();
-      SmartDashboard.putBoolean("Vision went?", imhere);
+      //Functions.TargetAuton();
+      //SmartDashboard.putBoolean("Vision went?", imhere);
+      stage++;
       break;
       case 3:
-      Functions.AutoShoot(4400, 4400, 0.7);
+      Functions.AutoShoot(4400, 4400, 0.7, false);
       break;
       case 4:
       Functions.TurnTo(-90);
       break;
       case 5:
-      Functions.DriveTo(84000, false, 0.2);
+      Functions.DriveTo(87500, false, 0.2);
       break;
       case 6:
       Functions.TurnTo(-3);
       break;
       case 7:
-      Functions.DriveTo(180000, true, 0.3);
+      Functions.DriveTo(180000, true, 0.2);
       break;
       case 8:
-      Functions.TargetAuton();
+      //Functions.TargetAuton();
+      stage++;
       break;
       case 9:
-      Functions.AutoShoot(4400, 4400, 0.2);
+      Functions.AutoShoot(4400, 4400, 0.2, true);
+      break;
       default:
+      Intake.set(0);
       r1.setNeutralMode(NeutralMode.Coast);
       l1.setNeutralMode(NeutralMode.Coast);
       r2.setNeutralMode(NeutralMode.Coast);
