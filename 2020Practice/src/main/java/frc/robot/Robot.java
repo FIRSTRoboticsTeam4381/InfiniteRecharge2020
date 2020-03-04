@@ -12,12 +12,6 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Units;
-
-import java.security.Provider;
-import java.util.concurrent.TimeUnit;
-
-import javax.print.CancelablePrintJob;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
@@ -26,7 +20,6 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -75,7 +68,8 @@ public class Robot extends TimedRobot {
   public double midx2 = 0;
   private double tensortime = 0;
 
-  public double offset = 3; //Change Offsett value
+  public double offsetTar = 3; //Change Offsett value
+  public double offsetBall = 20; //Change Offsett value
 
   public double sizeCheck = 100;
 
@@ -299,10 +293,6 @@ public class Robot extends TimedRobot {
   }
 
 
- 
-
-  
-
   /**
    * This function is called periodically during operator control.
    */
@@ -323,30 +313,9 @@ public class Robot extends TimedRobot {
 
     //Vision target, if the button is pressed vision kicks in
     if(spStick.getRawButton(3) || spStick.getRawButton(5)){
-      //SmartDashboard.putNumber("cam", 0);
-      if(Visionclass.compareTo("Target") >= 0){
+      //Call Vision teleop function
+      Functions.TargetTel();
 
-        if((shootTurret.getSelectedSensorPosition() < lStop && shootTurret.getSelectedSensorPosition() > rStop)){
-          
-          Functions.inbetweenTarget();
-          
-        }
-        else if(shootTurret.getSelectedSensorPosition() <= rStop){
-
-          Functions.pastRightTarget();
-  
-        }
-
-        else if(shootTurret.getSelectedSensorPosition() >= lStop){
-          Functions.pastLeftTarget();
-
-        }
-        
-        else{
-          Turnvaltar = 0;
-        }
-        shootTurret.set(-Turnvaltar);
-      }
     }
 
     //If the button isnt pressed you can control it
@@ -366,7 +335,7 @@ public class Robot extends TimedRobot {
         if(shootTurret.getSelectedSensorPosition() <= rStop){
 
           if(spStick.getZ() < 0){
-            shootTurret.set(spStick.getZ() *0.3);
+            shootTurret.set(spStick.getZ() * 0.3);
           }
 
           else{
@@ -379,7 +348,7 @@ public class Robot extends TimedRobot {
         else if(shootTurret.getSelectedSensorPosition() >= lStop){
 
           if(spStick.getZ() > 0){
-            shootTurret.set(spStick.getZ() *0.3);
+            shootTurret.set(spStick.getZ() * 0.3);
           }
 
           else{
@@ -397,13 +366,13 @@ public class Robot extends TimedRobot {
     //Shooter rev up
     if(spStick.getRawButton(1)){
       if(shoot){
-        tempShoot = sequenceEnc.getPosition() -
-         sequenceEnc.getPosition() % 8.5;
+        tempShoot = sequenceEnc.getPosition() - sequenceEnc.getPosition() % 8.5;
         shoot = false;
       }
       if(!(sequenceEnc.getPosition() % 8.5 <= 0.1) && !(sequencer.get() < 0.1 && sequencer.get() > 0.1)){
         indexPID.setReference(tempShoot,ControlType.kPosition);
-      }else{
+      }
+      else{
         indexPID.setReference(tempShoot,ControlType.kPosition);
         kicker.set(-1);
       }
@@ -426,7 +395,7 @@ public class Robot extends TimedRobot {
       shootTop.set(0);
       shootBottom.set(0);
       shoot = true;
-        }
+    }
     
     //ball stuck get out of da robot you goofy goober
     if(spStick.getRawButton(12) || spStick.getRawButton(11)){
@@ -458,11 +427,11 @@ public class Robot extends TimedRobot {
     }
     //outtake the ball
     else if(spStick.getRawButton(9)){
-        Intake.set(.5);
-      }
+      Intake.set(.5);
+    }
     else{
-        Intake.set(0);
-      }
+      Intake.set(0);
+    }
 
     if(spStick.getRawButton(4)){
       climb.set(.5);
