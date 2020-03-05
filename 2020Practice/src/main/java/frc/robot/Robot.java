@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Units;
 
@@ -40,6 +42,12 @@ import com.kauailabs.navx.frc.AHRS;
  * project.
  */
 public class Robot extends TimedRobot {
+
+  private static final String kDefaultAuto = "Default";
+  private static final String KPortalAuto = "In Front of Portal";
+  private static final String kDriveShoot = "Drive Forward and Shoot";
+  private String m_autoSelected;
+  private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   public CANSparkMax sequencer;
   //public SparkMax HandleExtension;
@@ -143,6 +151,12 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     Functions.robot = this;
+
+    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
+    m_chooser.addOption("Full Portal ", KPortalAuto);
+    m_chooser.addOption("Drive Forward and Shoot", kDriveShoot);
+
+    SmartDashboard.putData("Auto choices", m_chooser);
 
     ahrs = new AHRS(SPI.Port.kMXP);
 
@@ -248,6 +262,10 @@ public class Robot extends TimedRobot {
     tempLeft = l1.getSelectedSensorPosition();
     tempAutoShoot = sequenceEnc.getPosition();
     ahrs.reset();
+
+    m_autoSelected = m_chooser.getSelected();
+    System.out.println("Auto selected: " + m_autoSelected);
+
   }
 
   /**
@@ -256,45 +274,73 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {  
     SmartDashboard.putBoolean("Vision went?", imhere);
-    switch(stage){
-      case 1:
-      Functions.DriveTo(100000, false, 0.2);
+    switch (m_autoSelected) {
+      case KPortalAuto:
+      switch(stage){
+        case 1:
+        Functions.DriveTo(100000, false, 0.2);
+        break;
+        case 2:
+        Functions.TargetAuton();
+        break;
+        case 3:
+        Functions.AutoShoot(4400, 4400, 0.7, false);
+        break;
+        case 4:
+        Functions.TurnTo(-90);
+        break;
+        case 5:
+        Functions.DriveTo(87500, false, 0.2);
+        break;
+        case 6:
+        Functions.TurnTo(0);
+        break;
+        case 7:
+        Functions.DriveTo(180000, true, 0.2);
+        break;
+        case 8:
+        Functions.TargetAuton();
+        break;
+        case 9:
+        Functions.AutoShoot(4400, 4400, 0.2, true);
+        break;
+        default:
+        Intake.set(0);
+        r1.setNeutralMode(NeutralMode.Coast);
+        l1.setNeutralMode(NeutralMode.Coast);
+        r2.setNeutralMode(NeutralMode.Coast);
+        l2.setNeutralMode(NeutralMode.Coast); 
+        break;
+      } 
       break;
-      case 2:
-      Functions.TargetAuton();
-      //SmartDashboard.putBoolean("Vision went?", imhere);
-      //stage++;
+      case kDriveShoot:
+      switch(stage){
+        case 1:
+        Functions.DriveTo(100000, false, 0.2);
+        break;
+        case 2:
+        Functions.TargetAuton();
+        break;
+        case 3:
+        Functions.AutoShoot(4400, 4400, 0.7, false);
+        break;
+        default:
+        r1.setNeutralMode(NeutralMode.Coast);
+        l1.setNeutralMode(NeutralMode.Coast);
+        r2.setNeutralMode(NeutralMode.Coast);
+        l2.setNeutralMode(NeutralMode.Coast);
+        break;
+      }
       break;
-      case 3:
-      Functions.AutoShoot(4400, 4400, 0.7, false);
-      break;
-      case 4:
-      Functions.TurnTo(-90);
-      break;
-      case 5:
-      Functions.DriveTo(87500, false, 0.2);
-      break;
-      case 6:
-      Functions.TurnTo(0);
-      break;
-      case 7:
-      Functions.DriveTo(180000, true, 0.2);
-      break;
-      case 8:
-      Functions.TargetAuton();
-      //stage++;
-      break;
-      case 9:
-      Functions.AutoShoot(4400, 4400, 0.2, true);
-      break;
+      case kDefaultAuto:
       default:
-      Intake.set(0);
       r1.setNeutralMode(NeutralMode.Coast);
       l1.setNeutralMode(NeutralMode.Coast);
       r2.setNeutralMode(NeutralMode.Coast);
       l2.setNeutralMode(NeutralMode.Coast); 
       break;
-    } 
+    }
+    
 
   }
 
