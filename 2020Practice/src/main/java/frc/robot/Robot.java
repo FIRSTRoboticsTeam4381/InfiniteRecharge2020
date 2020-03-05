@@ -74,6 +74,7 @@ public class Robot extends TimedRobot {
   public double sizeCheck = 100;
 
   public double searchspeed = .2;
+  public double searchspeedTel = .15;
 
   public int t = 0;
   public boolean i = false;

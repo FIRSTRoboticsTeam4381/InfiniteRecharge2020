@@ -196,19 +196,20 @@ public class Functions {
         }
       }
       else{
-          //robot.Turnvaltar = robot.searchspeed;
-          robot.gottar = false;
-          robot.Turnvaltar = 0;
-      }
+        robot.Turnvaltar = robot.searchspeedTel;
+        robot.gottar = false;
+        //robot.Turnvaltar = 0;
+      
   
-      /*if(robot.shootTurret.getSelectedSensorPosition() >= robot.lStop && robot.Turnvaltar > 0){
-        robot.Turnvaltar = 0;
-        robot.searchspeed = -Math.abs(robot.searchspeed);
+        if(robot.shootTurret.getSelectedSensorPosition() >= robot.lStop && robot.Turnvaltar > 0){
+          robot.Turnvaltar = 0;
+          robot.searchspeedTel = -Math.abs(robot.searchspeedTel);
+        }
+        if(robot.shootTurret.getSelectedSensorPosition() <= robot.rStop && robot.Turnvaltar < 0){
+          robot.Turnvaltar = 0;
+          robot.searchspeedTel = Math.abs(robot.searchspeedTel);
+        }
       }
-      if(robot.shootTurret.getSelectedSensorPosition() <= robot.rStop && robot.Turnvaltar < 0){
-        robot.Turnvaltar = 0;
-        robot.searchspeed = Math.abs(robot.searchspeed);
-      }*/
       robot.shootTurret.set(-robot.Turnvaltar);
     } 
 
