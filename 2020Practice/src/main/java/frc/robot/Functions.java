@@ -70,140 +70,15 @@ public class Functions {
             }
     }
 
-    public static void inbetweenTarget(){
-
-        if(robot.distoff > 0){
-            //subtract the offset - Make sure you have the correct value!!!
-            robot.distoff = robot.distoff - robot.offset;
-        }
-  
-        else{
-            robot.distoff = robot.distoff + robot.offset;
-        }
-
-        if(robot.size > robot.sizeCheck && robot.size != 0){
-
-            if(robot.distoff <= 10 && robot.distoff >= -10){
-              robot.Turnvaltar = 0;
-            }
-
-            else{
-                robot.Turnvaltar = (0.003125 * robot.distoff);  
-                robot.Turnvaltar = robot.Turnvaltar * 0.35;
-            }
-
-          }
-          else if(robot.size < robot.sizeCheck && robot.size != 0){
-
-            if(robot.distoff <= 5 && robot.distoff >= -5){
-                robot.Turnvaltar = 0;
-            }
-
-            else{
-                robot.Turnvaltar = (0.003125 * robot.distoff);  
-                robot.Turnvaltar = robot.Turnvaltar * 0.3;
-              }
-
-          }
-    } 
-    
-    public static void pastRightTarget(){
-        if(robot.Turnvaltar > 0){
-
-          if(robot.distoff > 0){
-            //subtract the offset - Make sure you have the correct value!!!
-            robot.distoff = robot.distoff - robot.offset;
-          }
-  
-          else{
-            robot.distoff = robot.distoff + robot.offset;
-          }
-
-          if(robot.size > robot.sizeCheck && robot.size != 0){
-
-            if(robot.distoff <= 10 && robot.distoff >= -10){
-              robot.Turnvaltar = 0;
-            }
-
-            else{
-                robot.Turnvaltar = (0.003125 * robot.distoff);  
-                robot.Turnvaltar = robot.Turnvaltar * 0.35;
-            }
-
-          }
-          else if(robot.size < robot.sizeCheck && robot.size != 0){
-
-            if(robot.distoff <= 5 && robot.distoff >= -5){
-                robot.Turnvaltar = 0;
-            }
-
-            else{
-                robot.Turnvaltar = (0.003125 * robot.distoff);  
-                robot.Turnvaltar = robot.Turnvaltar * 0.3;
-              }
-
-            }
-
-          }
-
-        else{
-                robot.Turnvaltar = 0;
-            }
-    }
-
-    public static void pastLeftTarget(){
-        if(robot.Turnvaltar < 0){
-
-          if(robot.distoff > 0){
-            //subtract the offset - Make sure you have the correct value!!!
-            robot.distoff = robot.distoff - robot.offset;
-          }
-  
-          else{
-            robot.distoff = robot.distoff + robot.offset;
-          }
-
-          if(robot.size > robot.sizeCheck && robot.size != 0){
-
-            if(robot.distoff <= 10 && robot.distoff >= -10){
-              robot.Turnvaltar = 0;
-            }
-
-            else{
-                robot.Turnvaltar = (0.003125 * robot.distoff);  
-                robot.Turnvaltar = robot.Turnvaltar * 0.35;
-            }
-
-          }
-          else if(robot.size < robot.sizeCheck && robot.size != 0){
-
-            if(robot.distoff <= 5 && robot.distoff >= -5){
-                robot.Turnvaltar = 0;
-            }
-
-            else{
-                robot.Turnvaltar = (0.003125 * robot.distoff);  
-                robot.Turnvaltar = robot.Turnvaltar * 0.3;
-              }
-
-            }
-
-          }
-          else{
-            robot.Turnvaltar = 0;
-          }
-    }
-
     public static void TurnBallVision(){
         //calulates the turn value of the robot
-        robot.imhere = true;
         if(robot.distoff > 0){
             //subtract the offset - Make sure you have the correct value!!!
-            robot.distoff = robot.distoff - robot.offset;
+            robot.distoff = robot.distoff - robot.offsetBall;
           }
   
           else{
-            robot.distoff = robot.distoff + robot.offset;
+            robot.distoff = robot.distoff + robot.offsetBall;
           }
     
           if(robot.midx1 == 0){
@@ -267,11 +142,91 @@ public class Functions {
           }
     }
 
+    public static void TargetTel(){
+
+      if(robot.distoff > 0){
+          //subtract the offset - Make sure you have the correct value!!!
+          robot.distoff = robot.distoff - robot.offsetTar;
+      }
+
+      else{
+          robot.distoff = robot.distoff + robot.offsetTar;
+      }
+
+      if(robot.Visionclass.compareTo("Target") >= 0){
+        if(robot.size < robot.sizeCheck){
+          if(robot.distoff >= 10 || robot.distoff <= -10){
+            robot.gottar = false;
+          
+            robot.Turnvaltar = (0.003125 * robot.distoff);  
+            robot.Turnvaltar = robot.Turnvaltar * 0.25;
+  
+            if(robot.Turnvaltar > 0 && robot.Turnvaltar < .1){
+              robot.Turnvaltar = .05;
+            }
+            if(robot.Turnvaltar < 0 && robot.Turnvaltar > -.1){
+              robot.Turnvaltar = -.05;
+            }
+  
+          }
+          else{
+            robot.Turnvaltar = 0;
+            robot.gottar = true;
+          }
+        }
+        else if(robot.size >= robot.sizeCheck){
+          if(robot.distoff >= 5 || robot.distoff <= -5){
+            robot.gottar = false;
+          
+            robot.Turnvaltar = (0.003125 * robot.distoff);  
+            robot.Turnvaltar = robot.Turnvaltar * 0.4;
+  
+            if(robot.Turnvaltar > 0 && robot.Turnvaltar < .1){
+              robot.Turnvaltar = .1;
+            }
+            if(robot.Turnvaltar < 0 && robot.Turnvaltar > -.1){
+              robot.Turnvaltar = -.1;
+            }
+  
+          }
+          else{
+            robot.gottar = true;
+            robot.Turnvaltar = 0;
+          }
+        }
+      }
+      else{
+        robot.Turnvaltar = robot.searchspeedTel;
+        robot.gottar = false;
+        //robot.Turnvaltar = 0;
+      
+  
+        if(robot.shootTurret.getSelectedSensorPosition() >= robot.lStop && robot.Turnvaltar > 0){
+          robot.Turnvaltar = 0;
+          robot.searchspeedTel = -Math.abs(robot.searchspeedTel);
+        }
+        if(robot.shootTurret.getSelectedSensorPosition() <= robot.rStop && robot.Turnvaltar < 0){
+          robot.Turnvaltar = 0;
+          robot.searchspeedTel = Math.abs(robot.searchspeedTel);
+        }
+      }
+      robot.shootTurret.set(-robot.Turnvaltar);
+    } 
+
     public static void TargetAuton(){
       robot.Visionclass = SmartDashboard.getString("class", "");
       SmartDashboard.putNumber("ShootEnc", robot.shootTurret.getSelectedSensorPosition());
       SmartDashboard.putNumber("TurnVal", robot.Turnvaltar);
       robot.distoff = SmartDashboard.getNumber("distance off", 0);
+
+      if(robot.distoff > 0){
+        //subtract the offset - Make sure you have the correct value!!!
+        robot.distoff = robot.distoff - robot.offsetTar;
+      }
+
+      else{
+        robot.distoff = robot.distoff + robot.offsetTar;
+      }
 
       if(robot.Visionclass.compareTo("Target") >= 0){
         if(robot.distoff >= 10 || robot.distoff <= -10){
