@@ -156,27 +156,30 @@ public class Functions {
       if(robot.Visionclass.compareTo("Target") >= 0){
         if(robot.size < robot.sizeCheck){
           if(robot.distoff >= 10 || robot.distoff <= -10){
+            robot.gottar = false;
           
             robot.Turnvaltar = (0.003125 * robot.distoff);  
-            robot.Turnvaltar = robot.Turnvaltar * 0.5;
+            robot.Turnvaltar = robot.Turnvaltar * 0.25;
   
             if(robot.Turnvaltar > 0 && robot.Turnvaltar < .1){
-              robot.Turnvaltar = .1;
+              robot.Turnvaltar = .05;
             }
             if(robot.Turnvaltar < 0 && robot.Turnvaltar > -.1){
-              robot.Turnvaltar = -.1;
+              robot.Turnvaltar = -.05;
             }
   
           }
           else{
             robot.Turnvaltar = 0;
+            robot.gottar = true;
           }
         }
         else if(robot.size >= robot.sizeCheck){
           if(robot.distoff >= 5 || robot.distoff <= -5){
+            robot.gottar = false;
           
             robot.Turnvaltar = (0.003125 * robot.distoff);  
-            robot.Turnvaltar = robot.Turnvaltar * 0.35;
+            robot.Turnvaltar = robot.Turnvaltar * 0.4;
   
             if(robot.Turnvaltar > 0 && robot.Turnvaltar < .1){
               robot.Turnvaltar = .1;
@@ -187,22 +190,25 @@ public class Functions {
   
           }
           else{
+            robot.gottar = true;
             robot.Turnvaltar = 0;
           }
         }
       }
       else{
-          robot.Turnvaltar = robot.searchspeed;
+          //robot.Turnvaltar = robot.searchspeed;
+          robot.gottar = false;
+          robot.Turnvaltar = 0;
       }
   
-      if(robot.shootTurret.getSelectedSensorPosition() >= robot.lStop && robot.Turnvaltar > 0){
+      /*if(robot.shootTurret.getSelectedSensorPosition() >= robot.lStop && robot.Turnvaltar > 0){
         robot.Turnvaltar = 0;
         robot.searchspeed = -Math.abs(robot.searchspeed);
       }
       if(robot.shootTurret.getSelectedSensorPosition() <= robot.rStop && robot.Turnvaltar < 0){
         robot.Turnvaltar = 0;
         robot.searchspeed = Math.abs(robot.searchspeed);
-      }
+      }*/
       robot.shootTurret.set(-robot.Turnvaltar);
     } 
 

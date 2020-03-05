@@ -77,7 +77,7 @@ public class Robot extends TimedRobot {
 
   public int t = 0;
   public boolean i = false;
-  public boolean imhere = false;
+  public boolean gottar = false;
 
   public String Visionclass;
 
@@ -249,7 +249,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {  
-    SmartDashboard.putBoolean("Vision went?", imhere);
     switch(stage){
       case 1:
       Functions.DriveTo(100000, false, 0.2);
@@ -301,6 +300,7 @@ public class Robot extends TimedRobot {
     if(drStick.getRawButton(11)){
       //ahrs.reset();
       sequenceEnc.setPosition(0);
+      shootTurret.setSelectedSensorPosition(0);
     }
     //This gets all the numbers we need from the smart dashboard
     distoff = SmartDashboard.getNumber("distance off", 0);
@@ -377,12 +377,12 @@ public class Robot extends TimedRobot {
         kicker.set(-1);
       }
       //0.88
-      botWheelPID.setReference(0.88, ControlType.kDutyCycle);
-      topWheelPID.setReference(0.88, ControlType.kDutyCycle);
+      botWheelPID.setReference(0.90, ControlType.kDutyCycle);
+      topWheelPID.setReference(0.90, ControlType.kDutyCycle);
       shootTurret.set(0);
       
       if(drStick.getRawButton(4)){
-        tempShoot += 8.5;
+        tempShoot += 0.3;
       }
 
       if(shootTopEnc.getVelocity() > 4100 && shootBottomEnc.getVelocity() > 4100){
@@ -488,6 +488,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("left1Enc", l1.getSelectedSensorPosition());
     SmartDashboard.putNumber("right1Enc", r1.getSelectedSensorPosition());
     SmartDashboard.putNumber("Angle", ahrs.getAngle());
+    SmartDashboard.putBoolean("Got Target?", gottar);
 
 
     //calculates the timer for the drive and prediction
