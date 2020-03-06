@@ -138,6 +138,7 @@ public class Robot extends TimedRobot {
   public boolean shoot = false;
   public double tempShoot = 0;
   public AHRS ahrs;
+  public boolean increment = false;
 
   /**1
    * This function is run when the robot is first started up and should be
@@ -257,7 +258,7 @@ public class Robot extends TimedRobot {
     tempLeft = l1.getSelectedSensorPosition();
     tempAutoShoot = sequenceEnc.getPosition();
     ahrs.reset();
-
+    increment = true;
     m_autoSelected = m_chooser.getSelected();
     System.out.println("Auto selected: " + m_autoSelected);
 
@@ -268,35 +269,21 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {  
-    SmartDashboard.putBoolean("Vision went?", imhere);
     switch (m_autoSelected) {
       case KPortalAuto:
       switch(stage){
         case 1:
-        Functions.DriveTo(100000, false, 0.2);
+        Functions.DriveTo(100000, false, 1, increment, true);
+        //Functions.TargetAuton();
         break;
         case 2:
-        Functions.TargetAuton();
+        Functions.AutoShoot(4400, 4400, 0.7, true);
         break;
         case 3:
-        Functions.AutoShoot(4400, 4400, 0.7, false);
+        Functions.DriveTo(180000, true, 1, increment, true);
+        //Functions.TargetAuton();
         break;
         case 4:
-        Functions.TurnTo(-90);
-        break;
-        case 5:
-        Functions.DriveTo(87500, false, 0.2);
-        break;
-        case 6:
-        Functions.TurnTo(0);
-        break;
-        case 7:
-        Functions.DriveTo(180000, true, 0.2);
-        break;
-        case 8:
-        Functions.TargetAuton();
-        break;
-        case 9:
         Functions.AutoShoot(4400, 4400, 0.2, true);
         break;
         default:
@@ -311,12 +298,10 @@ public class Robot extends TimedRobot {
       case kDriveShoot:
       switch(stage){
         case 1:
-        Functions.DriveTo(100000, false, 0.2);
+        Functions.DriveTo(100000, false, 1, increment, true);
+        //Functions.TargetAuton();
         break;
         case 2:
-        Functions.TargetAuton();
-        break;
-        case 3:
         Functions.AutoShoot(4400, 4400, 0.7, false);
         break;
         default:

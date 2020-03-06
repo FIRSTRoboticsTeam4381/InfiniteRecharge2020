@@ -7,15 +7,21 @@ public class Functions {
 
     public static Robot robot;
 
-    public static void DriveTo(int pos, boolean pickBall, double speed) {
-        if(Math.abs(Math.abs(robot.l1.getSelectedSensorPosition()) - Math.abs(robot.tempLeft)) < pos
-         && Math.abs(Math.abs(robot.r1.getSelectedSensorPosition()) - Math.abs(robot.tempRight)) < pos){
+    public static void DriveTo(int pos, boolean pickBall, double speed, boolean inc, boolean modSpeed) {
+        if(Math.abs(Math.abs(robot.l1.getSelectedSensorPosition()) - Math.abs(robot.tempLeft)) < Math.abs(pos)
+         && Math.abs(Math.abs(robot.r1.getSelectedSensorPosition()) - Math.abs(robot.tempRight)) < Math.abs(pos)){
            if(pickBall){
                robot.Intake.set(-1);
                robot.sequencer.set(0.2);
            }
-           robot.r1.set(speed);
-           robot.l1.set(-speed);
+           if(modSpeed){
+            robot.r1.set((speed*((Math.abs(robot.tempLeft) - Math.abs(robot.l1.getSelectedSensorPosition())) / robot.tempLeft))+0.2);
+            robot.l1.set(-(speed*((Math.abs(robot.tempRight) - Math.abs(robot.r1.getSelectedSensorPosition())) / robot.tempRight))+0.2);
+           }else{
+            robot.r1.set(speed);
+            robot.l1.set(-speed);
+           }
+           
          }else{
             robot.sequencer.set(0);
             robot.r1.set(0);
@@ -23,7 +29,9 @@ public class Functions {
             robot.tempLeft = robot.l1.getSelectedSensorPosition();
             robot.tempRight = robot.r1.getSelectedSensorPosition();
             robot.tempAutoShoot = robot.sequenceEnc.getPosition();
-            robot.stage++; 
+            if(inc){
+              robot.stage++; 
+            }
          }
       }
     
@@ -244,7 +252,8 @@ public class Functions {
         }
         else{
           robot.Turnvaltar = 0;
-          robot.stage++;
+          RevEmUp(1);
+          robot.increment = true;
         }
       }
       else{
@@ -262,8 +271,9 @@ public class Functions {
       robot.shootTurret.set(-robot.Turnvaltar);
     }
 
-    public static void TeleShoot(){
-        robot.indexPID.setReference(8.5, ControlType.kPosition);
+    public static void RevEmUp(double FreedomsPerYeeHaw){
+      robot.botWheelPID.setReference(FreedomsPerYeeHaw, ControlType.kDutyCycle);
+      robot.topWheelPID.setReference(FreedomsPerYeeHaw, ControlType.kDutyCycle);
     }
     
 
