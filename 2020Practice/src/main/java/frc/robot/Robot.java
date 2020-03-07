@@ -27,6 +27,7 @@ import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.kauailabs.navx.frc.AHRS;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -43,13 +44,13 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   public CANSparkMax sequencer;
-  //public SparkMax HandleExtension;
+  // public SparkMax HandleExtension;
   public CANSparkMax shootTop;
   public CANSparkMax shootBottom;
   public CANEncoder shootTopEnc;
   public CANEncoder shootBottomEnc;
   public CANEncoder sequenceEnc;
-  //public SparkMax HandleDrive;
+  // public SparkMax HandleDrive;
   public CANPIDController indexPID;
 
   public WPI_VictorSPX kicker;
@@ -59,27 +60,26 @@ public class Robot extends TimedRobot {
 
   public WPI_TalonSRX climb;
 
-  //public WPI_TalonSRX ControlPanel;
+  public WPI_TalonSRX ControlPanel;
   public WPI_TalonSRX r1;
   public WPI_TalonSRX l1;
-  //public WPI_TalonSRX PickupArm;
- //
+  // public WPI_TalonSRX PickupArm;
+  //
   public WPI_TalonSRX shootTurret;
 
   public WPI_TalonSRX spool;
 
-
-  //Vision vars
+  // Vision vars
   public double distoff = 0;
   public double size = 0;
   public double midx1 = 0;
   public double midx2 = 0;
   private double tensortime = 0;
 
-  public double offsetTar = 3; //Change Offsett value
-  public double offsetBall = 20; //Change Offsett value
+  public double offsetTar = 3; // Change Offsett value
+  public double offsetBall = 20; // Change Offsett value
 
-  public double sizeCheck = 100;
+  public double sizeCheck = 70;
 
   public double searchspeed = .2;
   public double searchspeedTel = .15;
@@ -97,24 +97,24 @@ public class Robot extends TimedRobot {
 
   public double Turnvaltar = 0;
 
-//Joysticks
+  // Joysticks
   private Joystick drStick = new Joystick(0);
   private Joystick spStick = new Joystick(1);
   private DifferentialDrive drive;
 
-  public int lStop = 50; //CHANGE LATER
-  public int rStop = -31200; //CHANGE LATER
+  public int lStop = 50; // CHANGE LATER
+  public int rStop = -31200; // CHANGE LATER
 
-  private double kP = 16;
-  private double kI = 1e-4;
-  private double kD = 9;
+  private double kP = 0.00009;
+  private double kI = 0;
+  private double kD = 0.000003;
   private double kIz = 0;
-  private double kFF = 18;
-  private double kP1 = 16;
-  private double kI1 = 1e-4;
-  private double kD1 = 9;
+  private double kFF = 0.00022;
+  private double kP1 = 0.00009;
+  private double kI1 = 0;
+  private double kD1 = 0.000003;
   private double kIz1 = 0;
-  private double kFF1 = 18;
+  private double kFF1 = 0.00022;
   private double kMaxOutput = 1;
   private double kMinOutput = -1;
 
@@ -140,9 +140,9 @@ public class Robot extends TimedRobot {
   public AHRS ahrs;
   public boolean increment = false;
 
-  /**1
-   * This function is run when the robot is first started up and should be
-   * used for any initialization code.
+  /**
+   * 1 This function is run when the robot is first started up and should be used
+   * for any initialization code.
    */
   @Override
   public void robotInit() {
@@ -171,7 +171,10 @@ public class Robot extends TimedRobot {
     shootBottom = new CANSparkMax(53, MotorType.kBrushless);
     shootTopEnc = new CANEncoder(shootTop);
     shootBottomEnc = new CANEncoder(shootBottom);
-    
+
+    shootBottom.restoreFactoryDefaults();
+    shootTop.restoreFactoryDefaults();
+
     botWheelPID = shootBottom.getPIDController();
     botWheelPID.setP(kP1);
     botWheelPID.setI(kI1);
@@ -187,7 +190,7 @@ public class Robot extends TimedRobot {
     topWheelPID.setIZone(kIz);
     topWheelPID.setFF(kFF);
     topWheelPID.setOutputRange(kMinOutput, kMaxOutput);
-    
+
     sequencer = new CANSparkMax(46, MotorType.kBrushless);
     sequencer.setIdleMode(IdleMode.kCoast);
     sequenceEnc = new CANEncoder(sequencer);
@@ -201,16 +204,16 @@ public class Robot extends TimedRobot {
     indexPID.setOutputRange(-0.5, 0.5);
 
     kicker = new WPI_VictorSPX(7);
-    
-    climb = new WPI_TalonSRX(0); //CHANGE
 
-    //PickupArm = new WPI_TalonSRX(1);
+    // climb = new WPI_TalonSRX(0); //CHANGE
+
+    ControlPanel = new WPI_TalonSRX(8);
     Intake = new WPI_VictorSPX(2);
 
-    spool = new WPI_TalonSRX(5); //Change device number
+    spool = new WPI_TalonSRX(5); // Change device number
 
     drive = new DifferentialDrive(l1, r1);
-    
+
     botWheelPID.setIAccum(0);
     topWheelPID.setIAccum(0);
 
@@ -218,18 +221,18 @@ public class Robot extends TimedRobot {
     l1.configPeakCurrentLimit(30);
     sequenceEnc.setPosition(0);
 
-    
     ahrs.reset();
+
   }
 
-
   /**
-   * This function is called every robot packet, no matter the mode. Use
-   * this for items like diagnostics that you want ran during disabled,
-   * autonomous, teleoperated and test.
+   * This function is called every robot packet, no matter the mode. Use this for
+   * items like diagnostics that you want ran during disabled, autonomous,
+   * teleoperated and test.
    *
-   * <p>This runs after the mode specific periodic functions, but before
-   * LiveWindow and SmartDashboard integrated updating.
+   * <p>
+   * This runs after the mode specific periodic functions, but before LiveWindow
+   * and SmartDashboard integrated updating.
    */
   @Override
   public void robotPeriodic() {
@@ -237,14 +240,15 @@ public class Robot extends TimedRobot {
 
   /**
    * This autonomous (along with the chooser code above) shows how to select
-   * between different autonomous modes using the dashboard. The sendable
-   * chooser code works with the Java SmartDashboard. If you prefer the
-   * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-   * getString line to get the auto name from the text box below the Gyro
+   * between different autonomous modes using the dashboard. The sendable chooser
+   * code works with the Java SmartDashboard. If you prefer the LabVIEW Dashboard,
+   * remove all of the chooser code and uncomment the getString line to get the
+   * auto name from the text box below the Gyro
    *
-   * <p>You can add additional auto modes by adding additional comparisons to
-   * the switch structure below with additional strings. If using the
-   * SendableChooser make sure to add them to the chooser code above as well.
+   * <p>
+   * You can add additional auto modes by adding additional comparisons to the
+   * switch structure below with additional strings. If using the SendableChooser
+   * make sure to add them to the chooser code above as well.
    */
   @Override
   public void autonomousInit() {
@@ -268,43 +272,26 @@ public class Robot extends TimedRobot {
    * This function is called periodically during autonomous.
    */
   @Override
-  public void autonomousPeriodic() {  
+  public void autonomousPeriodic() {
     switch (m_autoSelected) {
-      case KPortalAuto:
-      switch(stage){
-        case 1:
+    case KPortalAuto:
+      switch (stage) {
+      case 1:
         Functions.DriveTo(100000, false, 1, increment, true);
-        //Functions.TargetAuton();
+        // Functions.TargetAuton();
         break;
-        case 2:
+      case 2:
         Functions.AutoShoot(4400, 4400, 0.7, true);
         break;
-        case 3:
+      case 3:
         Functions.DriveTo(180000, true, 1, increment, true);
-        //Functions.TargetAuton();
+        // Functions.TargetAuton();
         break;
-        case 4:
+      case 4:
         Functions.AutoShoot(4400, 4400, 0.2, true);
         break;
-        default:
+      default:
         Intake.set(0);
-        r1.setNeutralMode(NeutralMode.Coast);
-        l1.setNeutralMode(NeutralMode.Coast);
-        r2.setNeutralMode(NeutralMode.Coast);
-        l2.setNeutralMode(NeutralMode.Coast); 
-        break;
-      } 
-      break;
-      case kDriveShoot:
-      switch(stage){
-        case 1:
-        Functions.DriveTo(100000, false, 1, increment, true);
-        //Functions.TargetAuton();
-        break;
-        case 2:
-        Functions.AutoShoot(4400, 4400, 0.7, false);
-        break;
-        default:
         r1.setNeutralMode(NeutralMode.Coast);
         l1.setNeutralMode(NeutralMode.Coast);
         r2.setNeutralMode(NeutralMode.Coast);
@@ -312,79 +299,97 @@ public class Robot extends TimedRobot {
         break;
       }
       break;
-      case kDefaultAuto:
+    case kDriveShoot:
+      switch (stage) {
+      case 1:
+        Functions.DriveTo(100000, false, 1, increment, true);
+        // Functions.TargetAuton();
+        break;
+      case 2:
+        Functions.AutoShoot(4400, 4400, 0.7, false);
+        break;
       default:
+        r1.setNeutralMode(NeutralMode.Coast);
+        l1.setNeutralMode(NeutralMode.Coast);
+        r2.setNeutralMode(NeutralMode.Coast);
+        l2.setNeutralMode(NeutralMode.Coast);
+        break;
+      }
+      break;
+    case kDefaultAuto:
+    default:
       r1.setNeutralMode(NeutralMode.Coast);
       l1.setNeutralMode(NeutralMode.Coast);
       r2.setNeutralMode(NeutralMode.Coast);
-      l2.setNeutralMode(NeutralMode.Coast); 
+      l2.setNeutralMode(NeutralMode.Coast);
       break;
     }
-    
 
   }
-
 
   /**
    * This function is called periodically during operator control.
    */
   @Override
   public void teleopPeriodic() {
-    if(drStick.getRawButton(11)){
-      //ahrs.reset();
-      sequenceEnc.setPosition(0);
+    if (drStick.getRawButton(11)) {
+      // ahrs.reset();
       shootTurret.setSelectedSensorPosition(0);
+      sequenceEnc.setPosition(0);
+
     }
-    //This gets all the numbers we need from the smart dashboard
+    // This gets all the numbers we need from the smart dashboard
     distoff = SmartDashboard.getNumber("distance off", 0);
     Visionclass = SmartDashboard.getString("class", "");
     size = SmartDashboard.getNumber("size", 0);
     midx1 = SmartDashboard.getNumber("mid x", 0);
     tensortime = SmartDashboard.getNumber("time", 0);
 
-    //Specials stuff
+    // Specials stuff
 
-    //Vision target, if the button is pressed vision kicks in
-    if(spStick.getRawButton(3) || spStick.getRawButton(5)){
-      //Call Vision teleop function
+    // Vision target, if the button is pressed vision kicks in
+    if (spStick.getRawButton(3) || spStick.getRawButton(5)) {
+      // Call Vision teleop function
       Functions.TargetTel();
 
     }
 
-    //If the button isnt pressed you can control it
-    else{
+    // If the button isnt pressed you can control it
+    else {
 
-      //if its inbetween the two positions you can move it either way or you hit button 6 or 7
-      if((shootTurret.getSelectedSensorPosition() < lStop && shootTurret.getSelectedSensorPosition() > rStop) || (spStick.getRawButton(7) || spStick.getRawButton(8))){
-     
+      // if its inbetween the two positions you can move it either way or you hit
+      // button 6 or 7
+      if ((shootTurret.getSelectedSensorPosition() < lStop && shootTurret.getSelectedSensorPosition() > rStop)
+          || (spStick.getRawButton(7) || spStick.getRawButton(8))) {
+
         shootTurret.set(-spStick.getZ() * 0.3);
 
       }
 
-      //If it hit one of the stops you can only move one way
-      else if(shootTurret.getSelectedSensorPosition() < rStop || shootTurret.getSelectedSensorPosition() > lStop){
+      // If it hit one of the stops you can only move one way
+      else if (shootTurret.getSelectedSensorPosition() < rStop || shootTurret.getSelectedSensorPosition() > lStop) {
 
-        //if it hit the r stop you can only move left
-        if(shootTurret.getSelectedSensorPosition() <= rStop){
+        // if it hit the r stop you can only move left
+        if (shootTurret.getSelectedSensorPosition() <= rStop) {
 
-          if(spStick.getZ() < 0){
+          if (spStick.getZ() < 0) {
             shootTurret.set(spStick.getZ() * 0.3);
           }
 
-          else{
+          else {
             shootTurret.set(0);
           }
 
         }
 
-        //if it hit the l stop you can only move right
-        else if(shootTurret.getSelectedSensorPosition() >= lStop){
+        // if it hit the l stop you can only move right
+        else if (shootTurret.getSelectedSensorPosition() >= lStop) {
 
-          if(spStick.getZ() > 0){
+          if (spStick.getZ() > 0) {
             shootTurret.set(spStick.getZ() * 0.3);
           }
 
-          else{
+          else {
             shootTurret.set(0);
           }
 
@@ -394,122 +399,123 @@ public class Robot extends TimedRobot {
 
     }
 
-
-
-    //Shooter rev up
-    if(spStick.getRawButton(1)){
-      if(shoot){
+    // Shooter rev up
+    if (spStick.getRawButton(1)) {
+      if (shoot) {
         tempShoot = sequenceEnc.getPosition() - sequenceEnc.getPosition() % 8.5;
         shoot = false;
       }
-      if(!(sequenceEnc.getPosition() % 8.5 <= 0.1) && !(sequencer.get() < 0.1 && sequencer.get() > 0.1)){
-        indexPID.setReference(tempShoot,ControlType.kPosition);
-      }
-      else{
-        indexPID.setReference(tempShoot,ControlType.kPosition);
+      if (!(sequenceEnc.getPosition() % 8.5 <= 0.1) && !(sequencer.get() < 0.1 && sequencer.get() > 0.1)) {
+        indexPID.setReference(tempShoot, ControlType.kPosition);
+      } else {
+        indexPID.setReference(tempShoot, ControlType.kPosition);
         kicker.set(-1);
       }
-      //0.88
-      botWheelPID.setReference(0.90, ControlType.kDutyCycle);
-      topWheelPID.setReference(0.90, ControlType.kDutyCycle);
-      shootTurret.set(0);
-      
-      if(drStick.getRawButton(4)){
-        tempShoot += 0.3;
+      // 0.88
+      botWheelPID.setReference(2984, ControlType.kVelocity);
+      topWheelPID.setReference(3202, ControlType.kVelocity);
+      shootTop.set(1);
+      // shootBottom.set(1);
+      // shootTurret.set(0);
+
+      if (drStick.getRawButton(4)) {
+        tempShoot += 0.7;
       }
 
-      if(shootTopEnc.getVelocity() > 4100 && shootBottomEnc.getVelocity() > 4100){
-        tempShoot += 0.2;
+      if (shootTopEnc.getVelocity() > 3100 && shootBottomEnc.getVelocity() > 2800) {
+        tempShoot += 0.5;
       }
-      
-    }
-    else{
-      //kicker.set(0);
+
+    } else {
+      // kicker.set(0);
       shootTop.set(0);
       shootBottom.set(0);
       shoot = true;
     }
-    
-    //ball stuck get out of da robot you goofy goober
-    if(spStick.getRawButton(12) || spStick.getRawButton(11)){
+
+    // ball stuck get out of da robot you goofy goober
+    if (spStick.getRawButton(12) || spStick.getRawButton(11)) {
       kicker.set(0.2);
       Intake.set(0.5);
       sequencer.set(-0.2);
-    }
-    else{
-      //kicker.set(0);
+    } else {
+      // kicker.set(0);
       Intake.set(0);
     }
 
-    if(spStick.getRawButton(10)){
+    if (spStick.getRawButton(10)) {
       kicker.set(.2);
     }
 
-    //Spool to pick up the arm so we fit ;)
-    if(spStick.getRawButton(12)){
+    // Spool to pick up the arm so we fit ;)
+    if (spStick.getRawButton(12)) {
       spool.set(.5);
-    }
-    else{
+    } else {
       spool.set(0);
     }
 
-    //intake the ball - R.I.P Scoopy motor :(
-    if(spStick.getRawButton(2)){
+    // intake the ball - R.I.P Scoopy motor :(
+    if (spStick.getRawButton(2)) {
       Intake.set(-1);
       sequencer.set(0.2);
     }
-    //outtake the ball
-    else if(spStick.getRawButton(9)){
+    // outtake the ball
+    else if (spStick.getRawButton(9)) {
       Intake.set(.5);
-    }
-    else{
+    } else {
       Intake.set(0);
     }
+    /*
+     * if(spStick.getRawButton(4)){ climb.set(.5); } else
+     * if(spStick.getRawButton(6)){ climb.set(-.5); } else{ climb.set(0); }
+     */
 
-    if(spStick.getRawButton(4)){
-      climb.set(.5);
-    }
-    else if(spStick.getRawButton(6)){
-      climb.set(-.5);
-    }
-    else{
-      climb.set(0);
+    if (drStick.getRawButton(2)) {
+      ControlPanel.set(0.85);
+    } else {
+      ControlPanel.set(0);
     }
 
-    //turn the sequencer off
-    if(!spStick.getRawButton(2) && !spStick.getRawButton(12) && !spStick.getRawButton(11) && !spStick.getRawButton(1)){
+    // turn the sequencer off
+    if (!spStick.getRawButton(2) && !spStick.getRawButton(12) && !spStick.getRawButton(11)
+        && !spStick.getRawButton(1)) {
       sequencer.set(0);
     }
 
-    if(!spStick.getRawButton(10) && !spStick.getRawButton(12) && !spStick.getRawButton(11) && !spStick.getRawButton(1)){
+    if (!spStick.getRawButton(10) && !spStick.getRawButton(12) && !spStick.getRawButton(11)
+        && !spStick.getRawButton(1)) {
       kicker.set(0);
     }
 
+    // Driver Stuff
 
-    //Driver Stuff
-
-    //If you press 1 you vision good
-    if(drStick.getRawButton(1)){
+    // If you press 1 you vision good
+    if (drStick.getRawButton(1)) {
       SmartDashboard.putNumber("cam", 1);
 
-      //Make sure it has a ball
-      if(Visionclass.compareTo("ball") >= 0){
+      // Make sure it has a ball
+      if (Visionclass.compareTo("ball") >= 0) {
 
         Functions.TurnBallVision();
-  
+
         Functions.SpeedBallVision();
 
-        //actually drive to the robot
+        // actually drive to the robot
         drive.arcadeDrive(Speedvalball, Turnvalball);
+      }
     }
-  }
-  //if your not activating vision you can drive nic and corey
-  else{
-    SmartDashboard.putNumber("cam", 0);
-    drive.arcadeDrive(drStick.getY(), -drStick.getZ());
-  }
-    
-    //puts any nessacary values on the smart dashboard
+    // if your not activating vision you can drive nic and corey
+    else {
+      SmartDashboard.putNumber("cam", 0);
+      if(spStick.getRawButton(1)){
+        drive.arcadeDrive(0, 0);
+      }
+      else{
+        drive.arcadeDrive(drStick.getY(), -drStick.getZ());
+      }
+    }
+
+    // puts any nessacary values on the smart dashboard
     SmartDashboard.putNumber("ShootEnc", shootTurret.getSelectedSensorPosition());
     SmartDashboard.putNumber("Speedval", Speedvalball);
     SmartDashboard.putNumber("Turn Value", Turnvalball);
@@ -522,15 +528,16 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("right1Enc", r1.getSelectedSensorPosition());
     SmartDashboard.putNumber("Angle", ahrs.getAngle());
     SmartDashboard.putBoolean("Got Target?", gottar);
+    SmartDashboard.putNumber("ShootTop", shootTop.getAppliedOutput());
+    SmartDashboard.putNumber("ShootBottom", shootBottom.getAppliedOutput());
 
-
-    //calculates the timer for the drive and prediction
-    if(t < 51){
+    // calculates the timer for the drive and prediction
+    if (t < 51) {
       t++;
-    }
-    else{
+    } else {
       i = true;
     }
+
   }
 
   /**
@@ -540,4 +547,3 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
   }
 }
-

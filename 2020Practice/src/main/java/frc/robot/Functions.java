@@ -162,8 +162,8 @@ public class Functions {
       }
 
       if(robot.Visionclass.compareTo("Target") >= 0){
-        if(robot.size < robot.sizeCheck){
-          if(robot.distoff >= 10 || robot.distoff <= -10){
+        if(robot.size > robot.sizeCheck){
+          if(robot.distoff > 10 || robot.distoff < -10){
             robot.gottar = false;
           
             robot.Turnvaltar = (0.003125 * robot.distoff);  
@@ -182,18 +182,18 @@ public class Functions {
             robot.gottar = true;
           }
         }
-        else if(robot.size >= robot.sizeCheck){
+        else if(robot.size <= robot.sizeCheck){
           if(robot.distoff >= 5 || robot.distoff <= -5){
             robot.gottar = false;
           
             robot.Turnvaltar = (0.003125 * robot.distoff);  
-            robot.Turnvaltar = robot.Turnvaltar * 0.4;
+            robot.Turnvaltar = robot.Turnvaltar * 0.25;
   
             if(robot.Turnvaltar > 0 && robot.Turnvaltar < .1){
-              robot.Turnvaltar = .1;
+              robot.Turnvaltar = .05;
             }
             if(robot.Turnvaltar < 0 && robot.Turnvaltar > -.1){
-              robot.Turnvaltar = -.1;
+              robot.Turnvaltar = -.05;
             }
   
           }
@@ -204,23 +204,25 @@ public class Functions {
         }
       }
       else{
-        robot.Turnvaltar = robot.searchspeedTel;
+        robot.Turnvaltar = 0;
         robot.gottar = false;
         //robot.Turnvaltar = 0;
       
   
-        if(robot.shootTurret.getSelectedSensorPosition() >= robot.lStop && robot.Turnvaltar > 0){
+        /*if(robot.shootTurret.getSelectedSensorPosition() >= robot.lStop && robot.Turnvaltar > 0){
           robot.Turnvaltar = 0;
           robot.searchspeedTel = -Math.abs(robot.searchspeedTel);
         }
         if(robot.shootTurret.getSelectedSensorPosition() <= robot.rStop && robot.Turnvaltar < 0){
           robot.Turnvaltar = 0;
           robot.searchspeedTel = Math.abs(robot.searchspeedTel);
-        }
+        }*/
       }
       robot.shootTurret.set(-robot.Turnvaltar);
     } 
 
+    
+    
     public static void TargetAuton(){
       robot.Visionclass = SmartDashboard.getString("class", "");
       SmartDashboard.putNumber("ShootEnc", robot.shootTurret.getSelectedSensorPosition());
