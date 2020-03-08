@@ -15,8 +15,11 @@ public class Functions {
                robot.sequencer.set(0.2);
            }
            if(modSpeed){
-            robot.r1.set((speed*((Math.abs(robot.tempLeft) - Math.abs(robot.l1.getSelectedSensorPosition())) / robot.tempLeft))+0.2);
-            robot.l1.set(-(speed*((Math.abs(robot.tempRight) - Math.abs(robot.r1.getSelectedSensorPosition())) / robot.tempRight))+0.2);
+             
+              //robot.r1.set();
+             // robot.l1.set();
+             
+            
            }else{
             robot.r1.set(speed);
             robot.l1.set(-speed);
