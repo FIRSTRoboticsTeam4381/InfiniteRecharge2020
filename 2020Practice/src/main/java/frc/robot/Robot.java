@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
-
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -156,19 +156,28 @@ public class Robot extends TimedRobot {
 
     ahrs = new AHRS(SPI.Port.kMXP);
 
+    r1 = new WPI_TalonSRX(1);
+    r2 = new WPI_VictorSPX(2);
+    l1 = new WPI_TalonSRX(3);
+    l2 = new WPI_VictorSPX(4);
+    /*
     r1 = new WPI_TalonSRX(6);
     r2 = new WPI_VictorSPX(3);
     l1 = new WPI_TalonSRX(4);
     l2 = new WPI_VictorSPX(1);
-
+*/
     r2.follow(r1);
     l2.follow(l1);
 
-    shootTurret = new WPI_TalonSRX(9);
+    //shootTurret = new WPI_TalonSRX(9);
+    shootTurret = new WPI_TalonSRX(5);
     shootTurret.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
     shootTurret.setNeutralMode(NeutralMode.Brake);
-    shootTop = new CANSparkMax(45, MotorType.kBrushless);
-    shootBottom = new CANSparkMax(53, MotorType.kBrushless);
+    //shootTop = new CANSparkMax(45, MotorType.kBrushless);
+    //shootBottom = new CANSparkMax(53, MotorType.kBrushless);
+    shootTop = new CANSparkMax(56, MotorType.kBrushless);
+    shootBottom = new CANSparkMax(50, MotorType.kBrushless);
+
     shootTopEnc = new CANEncoder(shootTop);
     shootBottomEnc = new CANEncoder(shootBottom);
 
@@ -191,7 +200,9 @@ public class Robot extends TimedRobot {
     topWheelPID.setFF(kFF);
     topWheelPID.setOutputRange(kMinOutput, kMaxOutput);
 
-    sequencer = new CANSparkMax(46, MotorType.kBrushless);
+    sequencer = new CANSparkMax(54, MotorType.kBrushless);
+    //sequencer = new CANSparkMax(46, MotorType.kBrushless);
+
     sequencer.setIdleMode(IdleMode.kCoast);
     sequenceEnc = new CANEncoder(sequencer);
 
@@ -203,14 +214,21 @@ public class Robot extends TimedRobot {
     indexPID.setFF(sFF);
     indexPID.setOutputRange(-0.5, 0.5);
 
-    kicker = new WPI_VictorSPX(7);
+    kicker = new WPI_VictorSPX(9);
+    //kicker = new WPI_VictorSPX(7);
 
-    // climb = new WPI_TalonSRX(0); //CHANGE
+    climb = new WPI_TalonSRX(11); //CHANGE
 
-    ControlPanel = new WPI_TalonSRX(8);
-    Intake = new WPI_VictorSPX(2);
+   // ControlPanel = new WPI_TalonSRX(8);
+   // Intake = new WPI_VictorSPX(2);
 
-    spool = new WPI_TalonSRX(5); // Change device number
+    ControlPanel = new WPI_TalonSRX(10);
+    Intake = new WPI_VictorSPX(13);
+
+    spool = new WPI_TalonSRX(12); // Change device number
+
+    //spool = new WPI_TalonSRX(5); // Change device number
+
 
     drive = new DifferentialDrive(l1, r1);
 
@@ -302,11 +320,10 @@ public class Robot extends TimedRobot {
     case kDriveShoot:
       switch (stage) {
       case 1:
-        Functions.DriveTo(100000, false, 1, increment, true);
+        //Functions.DriveTo(100000, false, 0.3, true, false);
         // Functions.TargetAuton();
-        break;
-      case 2:
-        Functions.AutoShoot(4400, 4400, 0.7, false);
+        r1.set(ControlMode.Position, tempRight + 7000);
+        l1.set(ControlMode.Position, tempLeft + 7000);
         break;
       default:
         r1.setNeutralMode(NeutralMode.Coast);
@@ -405,7 +422,7 @@ public class Robot extends TimedRobot {
         tempShoot = sequenceEnc.getPosition() - sequenceEnc.getPosition() % 8.5;
         shoot = false;
       }
-      if (!(sequenceEnc.getPosition() % 8.5 <= 0.1) && !(sequencer.get() < 0.1 && sequencer.get() > 0.1)) {
+      if (!(sequenceEnc.getPosition() % 10.5 <= 0.1) && !(sequencer.get() < 0.1 && sequencer.get() > 0.1)) {
         indexPID.setReference(tempShoot, ControlType.kPosition);
       } else {
         indexPID.setReference(tempShoot, ControlType.kPosition);
@@ -448,9 +465,11 @@ public class Robot extends TimedRobot {
     }
 
     // Spool to pick up the arm so we fit ;)
-    if (spStick.getRawButton(12)) {
+    if (drStick.getRawButton(7)) {
       spool.set(.5);
-    } else {
+    } else if(drStick.getRawButton(8)){
+      spool.set(-.5);
+    }else{
       spool.set(0);
     }
 
@@ -465,10 +484,10 @@ public class Robot extends TimedRobot {
     } else {
       Intake.set(0);
     }
-    /*
-     * if(spStick.getRawButton(4)){ climb.set(.5); } else
-     * if(spStick.getRawButton(6)){ climb.set(-.5); } else{ climb.set(0); }
-     */
+    
+      if(spStick.getRawButton(4)){ climb.set(.5); } else
+      if(spStick.getRawButton(6)){ climb.set(-.5); } else{ climb.set(0); }
+     
 
     if (drStick.getRawButton(2)) {
       ControlPanel.set(0.85);
