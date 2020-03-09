@@ -170,7 +170,7 @@ public class Functions {
             robot.gottar = false;
           
             robot.Turnvaltar = (0.003125 * robot.distoff);  
-            robot.Turnvaltar = robot.Turnvaltar * 0.25;
+            robot.Turnvaltar = robot.Turnvaltar * 0.3;
   
             if(robot.Turnvaltar > 0 && robot.Turnvaltar < .1){
               robot.Turnvaltar = .05;

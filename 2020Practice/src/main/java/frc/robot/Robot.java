@@ -19,6 +19,8 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
@@ -109,12 +111,12 @@ public class Robot extends TimedRobot {
   private double kI = 0;
   private double kD = 0.000003;
   private double kIz = 0;
-  private double kFF = 0.00022;
+  private double kFF = 0.0003;
   private double kP1 = 0.00009;
   private double kI1 = 0;
   private double kD1 = 0.000003;
   private double kIz1 = 0;
-  private double kFF1 = 0.00022;
+  private double kFF1 = 0.0003;
   private double kMaxOutput = 1;
   private double kMinOutput = -1;
 
@@ -175,8 +177,8 @@ public class Robot extends TimedRobot {
     shootTurret.setNeutralMode(NeutralMode.Brake);
     //shootTop = new CANSparkMax(45, MotorType.kBrushless);
     //shootBottom = new CANSparkMax(53, MotorType.kBrushless);
-    shootTop = new CANSparkMax(56, MotorType.kBrushless);
-    shootBottom = new CANSparkMax(50, MotorType.kBrushless);
+    shootTop = new CANSparkMax(50, MotorType.kBrushless);
+    shootBottom = new CANSparkMax(56, MotorType.kBrushless);
 
     shootTopEnc = new CANEncoder(shootTop);
     shootBottomEnc = new CANEncoder(shootBottom);
@@ -217,7 +219,11 @@ public class Robot extends TimedRobot {
     kicker = new WPI_VictorSPX(9);
     //kicker = new WPI_VictorSPX(7);
 
-    climb = new WPI_TalonSRX(11); //CHANGE
+    climb = new WPI_TalonSRX(11);
+    climb.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
+    climb.setNeutralMode(NeutralMode.Brake);
+    //climb.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
+    //climb.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
 
    // ControlPanel = new WPI_TalonSRX(8);
    // Intake = new WPI_VictorSPX(2);
@@ -353,6 +359,7 @@ public class Robot extends TimedRobot {
       // ahrs.reset();
       shootTurret.setSelectedSensorPosition(0);
       sequenceEnc.setPosition(0);
+      climb.setSelectedSensorPosition(0);
 
     }
     // This gets all the numbers we need from the smart dashboard
@@ -429,9 +436,11 @@ public class Robot extends TimedRobot {
         kicker.set(-1);
       }
       // 0.88
-      botWheelPID.setReference(2984, ControlType.kVelocity);
+      botWheelPID.setReference(2500, ControlType.kVelocity);
       topWheelPID.setReference(3202, ControlType.kVelocity);
-      shootTop.set(1);
+      //shootTop.set(1);
+      //shootBottom.set(1);
+      //shootTop.set(1);
       // shootBottom.set(1);
       // shootTurret.set(0);
 
@@ -439,7 +448,7 @@ public class Robot extends TimedRobot {
         tempShoot += 0.7;
       }
 
-      if (shootTopEnc.getVelocity() > 3100 && shootBottomEnc.getVelocity() > 2800) {
+      if (shootTopEnc.getVelocity() > 3100 && shootBottomEnc.getVelocity() > 2400) {
         tempShoot += 0.5;
       }
 
@@ -462,15 +471,6 @@ public class Robot extends TimedRobot {
 
     if (spStick.getRawButton(10)) {
       kicker.set(.2);
-    }
-
-    // Spool to pick up the arm so we fit ;)
-    if (drStick.getRawButton(7)) {
-      spool.set(.5);
-    } else if(drStick.getRawButton(8)){
-      spool.set(-.5);
-    }else{
-      spool.set(0);
     }
 
     // intake the ball - R.I.P Scoopy motor :(
@@ -506,7 +506,33 @@ public class Robot extends TimedRobot {
       kicker.set(0);
     }
 
+    if(spStick.getRawButton(1)){
+      climb.set(0);
+    }
+    else{
+      if(spStick.getY() > .2){
+        climb.set(spStick.getY());
+      }
+      else if(spStick.getY() < .2){
+        climb.set(spStick.getY());
+      }
+      else{
+        climb.set(0);
+      }
+    }
+
     // Driver Stuff
+
+    // Spool to pick up the arm so we fit ;)
+    if (drStick.getRawButton(7)) {
+      spool.set(.5);
+      } 
+    else if(drStick.getRawButton(8)){
+      spool.set(-.5);
+      }
+    else{
+        spool.set(0);
+        }
 
     // If you press 1 you vision good
     if (drStick.getRawButton(1)) {
@@ -536,6 +562,10 @@ public class Robot extends TimedRobot {
 
     // puts any nessacary values on the smart dashboard
     SmartDashboard.putNumber("ShootEnc", shootTurret.getSelectedSensorPosition());
+    SmartDashboard.putNumber("Shoot top enc", shootTopEnc.getPosition());
+    SmartDashboard.putNumber("Shoot top current", shootTop.getOutputCurrent());
+    SmartDashboard.putNumber("Shoot bot enc", shootBottomEnc.getPosition());
+    SmartDashboard.putNumber("Shoot bot current", shootBottom.getOutputCurrent());
     SmartDashboard.putNumber("Speedval", Speedvalball);
     SmartDashboard.putNumber("Turn Value", Turnvalball);
     SmartDashboard.putNumber("midx 1", midx1);
@@ -549,6 +579,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Got Target?", gottar);
     SmartDashboard.putNumber("ShootTop", shootTop.getAppliedOutput());
     SmartDashboard.putNumber("ShootBottom", shootBottom.getAppliedOutput());
+    SmartDashboard.putNumber("climb", climb.getSelectedSensorPosition());
 
     // calculates the timer for the drive and prediction
     if (t < 51) {
