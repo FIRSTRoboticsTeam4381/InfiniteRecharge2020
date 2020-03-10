@@ -83,7 +83,7 @@ public class Robot extends TimedRobot {
 
   public double sizeCheck = 70;
 
-  public double searchspeed = .2;
+  public double searchspeed = .15;
   public double searchspeedTel = .15;
 
   public int t = 0;
@@ -301,15 +301,15 @@ public class Robot extends TimedRobot {
     case KPortalAuto:
       switch (stage) {
       case 1:
-        Functions.DriveTo(100000, false, 1, increment, true);
-        // Functions.TargetAuton();
+        Functions.DriveTo(100000, false, .7, increment, false);
+        Functions.TargetAuton();
         break;
       case 2:
         Functions.AutoShoot(4400, 4400, 0.7, true);
         break;
       case 3:
         Functions.DriveTo(180000, true, 1, increment, true);
-        // Functions.TargetAuton();
+        Functions.TargetAuton();
         break;
       case 4:
         Functions.AutoShoot(4400, 4400, 0.2, true);

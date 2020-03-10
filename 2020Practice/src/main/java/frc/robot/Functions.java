@@ -257,12 +257,12 @@ public class Functions {
         }
         else{
           robot.Turnvaltar = 0;
-          RevEmUp(1);
+          //RevEmUp(1);
           robot.increment = true;
         }
       }
       else{
-         robot.Turnvaltar = robot.searchspeed;
+         robot.Turnvaltar = 0;
       }
 
       if(robot.shootTurret.getSelectedSensorPosition() >= robot.lStop && robot.Turnvaltar > 0){
