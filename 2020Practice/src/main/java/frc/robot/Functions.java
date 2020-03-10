@@ -245,24 +245,24 @@ public class Functions {
         if(robot.distoff >= 10 || robot.distoff <= -10){
         
           robot.Turnvaltar = (0.003125 * robot.distoff);  
-          robot.Turnvaltar = robot.Turnvaltar * 0.5;
+          robot.Turnvaltar = robot.Turnvaltar * 0.25;
 
           if(robot.Turnvaltar > 0 && robot.Turnvaltar < .1){
-            robot.Turnvaltar = .1;
+            robot.Turnvaltar = .05;
           }
           if(robot.Turnvaltar < 0 && robot.Turnvaltar > -.1){
-            robot.Turnvaltar = -.1;
+            robot.Turnvaltar = -.05;
           }
 
         }
         else{
           robot.Turnvaltar = 0;
-          //RevEmUp(1);
+          RevEmUp(1);
           robot.increment = true;
         }
       }
       else{
-         robot.Turnvaltar = 0;
+         robot.Turnvaltar = robot.searchspeed;
       }
 
       if(robot.shootTurret.getSelectedSensorPosition() >= robot.lStop && robot.Turnvaltar > 0){

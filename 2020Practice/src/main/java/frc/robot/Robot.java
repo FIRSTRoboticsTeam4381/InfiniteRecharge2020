@@ -7,6 +7,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.hal.sim.DriverStationSim;
+import edu.wpi.first.hal.sim.mockdata.DriverStationDataJNI;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -102,6 +105,7 @@ public class Robot extends TimedRobot {
   // Joysticks
   private Joystick drStick = new Joystick(0);
   private Joystick spStick = new Joystick(1);
+  private Joystick climbStick = new Joystick(2);
   private DifferentialDrive drive;
 
   public int lStop = 50; // CHANGE LATER
@@ -163,20 +167,18 @@ public class Robot extends TimedRobot {
     l1 = new WPI_TalonSRX(3);
     l2 = new WPI_VictorSPX(4);
     /*
-    r1 = new WPI_TalonSRX(6);
-    r2 = new WPI_VictorSPX(3);
-    l1 = new WPI_TalonSRX(4);
-    l2 = new WPI_VictorSPX(1);
-*/
+     * r1 = new WPI_TalonSRX(6); r2 = new WPI_VictorSPX(3); l1 = new
+     * WPI_TalonSRX(4); l2 = new WPI_VictorSPX(1);
+     */
     r2.follow(r1);
     l2.follow(l1);
 
-    //shootTurret = new WPI_TalonSRX(9);
+    // shootTurret = new WPI_TalonSRX(9);
     shootTurret = new WPI_TalonSRX(5);
     shootTurret.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
     shootTurret.setNeutralMode(NeutralMode.Brake);
-    //shootTop = new CANSparkMax(45, MotorType.kBrushless);
-    //shootBottom = new CANSparkMax(53, MotorType.kBrushless);
+    // shootTop = new CANSparkMax(45, MotorType.kBrushless);
+    // shootBottom = new CANSparkMax(53, MotorType.kBrushless);
     shootTop = new CANSparkMax(50, MotorType.kBrushless);
     shootBottom = new CANSparkMax(56, MotorType.kBrushless);
 
@@ -203,7 +205,7 @@ public class Robot extends TimedRobot {
     topWheelPID.setOutputRange(kMinOutput, kMaxOutput);
 
     sequencer = new CANSparkMax(54, MotorType.kBrushless);
-    //sequencer = new CANSparkMax(46, MotorType.kBrushless);
+    // sequencer = new CANSparkMax(46, MotorType.kBrushless);
 
     sequencer.setIdleMode(IdleMode.kCoast);
     sequenceEnc = new CANEncoder(sequencer);
@@ -217,24 +219,24 @@ public class Robot extends TimedRobot {
     indexPID.setOutputRange(-0.5, 0.5);
 
     kicker = new WPI_VictorSPX(9);
-    //kicker = new WPI_VictorSPX(7);
+    // kicker = new WPI_VictorSPX(7);
 
     climb = new WPI_TalonSRX(11);
     climb.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
     climb.setNeutralMode(NeutralMode.Brake);
-    //climb.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
-    //climb.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
+    // climb.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
+    // LimitSwitchNormal.NormallyOpen);
+    // climb.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
+    // LimitSwitchNormal.NormallyOpen);
 
-   // ControlPanel = new WPI_TalonSRX(8);
-   // Intake = new WPI_VictorSPX(2);
+    // ControlPanel = new WPI_TalonSRX(8);
+    // Intake = new WPI_VictorSPX(2);
 
     ControlPanel = new WPI_TalonSRX(10);
     Intake = new WPI_VictorSPX(13);
 
-    spool = new WPI_TalonSRX(12); // Change device number
-
-    //spool = new WPI_TalonSRX(5); // Change device number
-
+    spool = new WPI_TalonSRX(12);
+    // spool = new WPI_TalonSRX(5); // Change device number
 
     drive = new DifferentialDrive(l1, r1);
 
@@ -277,12 +279,11 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
-    //CHANGE THIS VARIABLE TO A NUMBER ABOVE 3 
-    //TO HAVE THE DEFAULT AUTO WHERE THE ROBOT DOESNT MOVE.
-    //SET THE VARIABLE TO 1 IN ORDER TO RUN THE DRIVE FORWARD
-    //AND SHOOT AUTONOMOUS.
+    // CHANGE THIS VARIABLE TO A NUMBER ABOVE 3
+    // TO HAVE THE DEFAULT AUTO WHERE THE ROBOT DOESNT MOVE.
+    // SET THE VARIABLE TO 1 IN ORDER TO RUN THE DRIVE FORWARD
+    // AND SHOOT AUTONOMOUS.
     stage = 1;
-
 
     sequenceEnc.setPosition(0);
     r1.setNeutralMode(NeutralMode.Brake);
@@ -305,76 +306,23 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
 
-    //BASIC AUTO FOR GULL LAKE
+    // BASIC AUTO FOR GULL LAKE
 
     switch (stage) {
-      case 1:
-        //TWEAK THE FIRST ARGUMENT TO ADJUST THE AMOUNT IT DRIVES FORWARD
-        //TWEAK THE THIRD ARGUMENT TO ADJUST THE SPEED AT WHICH THE ROBOT DRIVES FORWARD
-        Functions.DriveTo(100000, false, 0.3, true, false);
+    case 1:
+      // TWEAK THE FIRST ARGUMENT TO ADJUST THE AMOUNT IT DRIVES FORWARD
+      // TWEAK THE THIRD ARGUMENT TO ADJUST THE SPEED AT WHICH THE ROBOT DRIVES
+      // FORWARD
+      Functions.DriveTo(100000, false, 0.3, true, false);
 
-        Functions.TargetAuton();
-        break;
-      case 2:
-        //TWEAK THE FIRST TWO ARGUMENTS TO ALTER THE SHOOTER WHEEL SPEEDS
-        //THE FIRST NUMBER CONTROLS THE BOTTOM WHEEL
-        //THE SECOND NUMBER CONTROLS THE TOP WHEEL
-        Functions.AutoShoot(2500, 3202, 0.5, false);
-
-      default:
-        r1.setNeutralMode(NeutralMode.Coast);
-        l1.setNeutralMode(NeutralMode.Coast);
-        r2.setNeutralMode(NeutralMode.Coast);
-        l2.setNeutralMode(NeutralMode.Coast);
-        break;
-      }
-
-
-    //COMPLICATED AUTO TO WORK ON FOR KENTWOOD AND ALPENA AND STATES
-    /*
-    switch (m_autoSelected) {
-    case KPortalAuto:
-      switch (stage) {
-      case 1:
-        Functions.DriveTo(100000, false, .7, increment, false);
-        Functions.TargetAuton();
-        break;
-      case 2:
-        Functions.AutoShoot(4400, 4400, 0.7, true);
-        break;
-      case 3:
-        Functions.DriveTo(180000, true, 1, increment, true);
-        Functions.TargetAuton();
-        break;
-      case 4:
-        Functions.AutoShoot(4400, 4400, 0.2, true);
-        break;
-      default:
-        Intake.set(0);
-        r1.setNeutralMode(NeutralMode.Coast);
-        l1.setNeutralMode(NeutralMode.Coast);
-        r2.setNeutralMode(NeutralMode.Coast);
-        l2.setNeutralMode(NeutralMode.Coast);
-        break;
-      }
+      Functions.TargetAuton();
       break;
-    case kDriveShoot:
-      switch (stage) {
-      case 1:
-        //Functions.DriveTo(100000, false, 0.3, true, false);
-        // Functions.TargetAuton();
-        r1.set(ControlMode.Position, tempRight + 7000);
-        l1.set(ControlMode.Position, tempLeft + 7000);
-        break;
-      default:
-        r1.setNeutralMode(NeutralMode.Coast);
-        l1.setNeutralMode(NeutralMode.Coast);
-        r2.setNeutralMode(NeutralMode.Coast);
-        l2.setNeutralMode(NeutralMode.Coast);
-        break;
-      }
-      break;
-    case kDefaultAuto:
+    case 2:
+      // TWEAK THE FIRST TWO ARGUMENTS TO ALTER THE SHOOTER WHEEL SPEEDS
+      // THE FIRST NUMBER CONTROLS THE BOTTOM WHEEL
+      // THE SECOND NUMBER CONTROLS THE TOP WHEEL
+      Functions.AutoShoot(2500, 3202, 0.5, false);
+
     default:
       r1.setNeutralMode(NeutralMode.Coast);
       l1.setNeutralMode(NeutralMode.Coast);
@@ -382,7 +330,27 @@ public class Robot extends TimedRobot {
       l2.setNeutralMode(NeutralMode.Coast);
       break;
     }
-*/
+
+    // COMPLICATED AUTO TO WORK ON FOR KENTWOOD AND ALPENA AND STATES
+    /*
+     * switch (m_autoSelected) { case KPortalAuto: switch (stage) { case 1:
+     * Functions.DriveTo(100000, false, .7, increment, false);
+     * Functions.TargetAuton(); break; case 2: Functions.AutoShoot(4400, 4400, 0.7,
+     * true); break; case 3: Functions.DriveTo(180000, true, 1, increment, true);
+     * Functions.TargetAuton(); break; case 4: Functions.AutoShoot(4400, 4400, 0.2,
+     * true); break; default: Intake.set(0); r1.setNeutralMode(NeutralMode.Coast);
+     * l1.setNeutralMode(NeutralMode.Coast); r2.setNeutralMode(NeutralMode.Coast);
+     * l2.setNeutralMode(NeutralMode.Coast); break; } break; case kDriveShoot:
+     * switch (stage) { case 1: //Functions.DriveTo(100000, false, 0.3, true,
+     * false); // Functions.TargetAuton(); r1.set(ControlMode.Position, tempRight +
+     * 7000); l1.set(ControlMode.Position, tempLeft + 7000); break; default:
+     * r1.setNeutralMode(NeutralMode.Coast); l1.setNeutralMode(NeutralMode.Coast);
+     * r2.setNeutralMode(NeutralMode.Coast); l2.setNeutralMode(NeutralMode.Coast);
+     * break; } break; case kDefaultAuto: default:
+     * r1.setNeutralMode(NeutralMode.Coast); l1.setNeutralMode(NeutralMode.Coast);
+     * r2.setNeutralMode(NeutralMode.Coast); l2.setNeutralMode(NeutralMode.Coast);
+     * break; }
+     */
   }
 
   /**
@@ -415,6 +383,7 @@ public class Robot extends TimedRobot {
 
     // If the button isnt pressed you can control it
     else {
+      gottar = false;
 
       // if its inbetween the two positions you can move it either way or you hit
       // button 6 or 7
@@ -457,7 +426,6 @@ public class Robot extends TimedRobot {
       }
 
     }
-
     // Shooter rev up
     if (spStick.getRawButton(1)) {
       if (shoot) {
@@ -473,9 +441,9 @@ public class Robot extends TimedRobot {
       // 0.88
       botWheelPID.setReference(2500, ControlType.kVelocity);
       topWheelPID.setReference(3202, ControlType.kVelocity);
-      //shootTop.set(1);
-      //shootBottom.set(1);
-      //shootTop.set(1);
+      // shootTop.set(1);
+      // shootBottom.set(1);
+      // shootTop.set(1);
       // shootBottom.set(1);
       // shootTurret.set(0);
 
@@ -519,15 +487,13 @@ public class Robot extends TimedRobot {
     } else {
       Intake.set(0);
     }
-    
-      if(spStick.getRawButton(4)){ climb.set(.5); } else
-      if(spStick.getRawButton(6)){ climb.set(-.5); } else{ climb.set(0); }
-     
 
-    if (drStick.getRawButton(2)) {
-      ControlPanel.set(0.85);
+    if (spStick.getRawButton(4)) {
+      climb.set(.5);
+    } else if (spStick.getRawButton(6)) {
+      climb.set(-.5);
     } else {
-      ControlPanel.set(0);
+      climb.set(0);
     }
 
     // turn the sequencer off
@@ -541,40 +507,39 @@ public class Robot extends TimedRobot {
       kicker.set(0);
     }
 
-    if(spStick.getRawButton(1)){
+    if (climbStick.getY() > .2) {
+      climb.set(climbStick.getY());
+    } 
+    else if (climbStick.getY() < .2) {
+      climb.set(climbStick.getY());
+    } 
+    else {
       climb.set(0);
-    }
-    else{
-      if(spStick.getY() > .2){
-        climb.set(spStick.getY());
-      }
-      else if(spStick.getY() < .2){
-        climb.set(spStick.getY());
-      }
-      else{
-        climb.set(0);
-      }
     }
 
     // Driver Stuff
 
+    if (drStick.getRawButton(2)) {
+      ControlPanel.set(0.85);
+    } else {
+      ControlPanel.set(0);
+    }
+
     // Spool to pick up the arm so we fit ;)
-    if (drStick.getRawButton(7)) {
+    if (drStick.getRawButton(3)) {
       spool.set(.5);
-      } 
-    else if(drStick.getRawButton(8)){
+    } else if (drStick.getRawButton(5)) {
       spool.set(-.5);
-      }
-    else{
-        spool.set(0);
-        }
+    } else {
+      spool.set(0);
+    }
 
     // If you press 1 you vision good
     if (drStick.getRawButton(1)) {
       SmartDashboard.putNumber("cam", 1);
 
       // Make sure it has a ball
-      if (Visionclass.compareTo("ball") >= 0) {
+      /*if (Visionclass.compareTo("ball") >= 0) {
 
         Functions.TurnBallVision();
 
@@ -582,15 +547,14 @@ public class Robot extends TimedRobot {
 
         // actually drive to the robot
         drive.arcadeDrive(Speedvalball, Turnvalball);
-      }
+      }*/
     }
     // if your not activating vision you can drive nic and corey
     else {
       SmartDashboard.putNumber("cam", 0);
-      if(spStick.getRawButton(1)){
+      if (spStick.getRawButton(1)) {
         drive.arcadeDrive(0, 0);
-      }
-      else{
+      } else {
         drive.arcadeDrive(drStick.getY(), -drStick.getZ());
       }
     }
@@ -615,6 +579,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("ShootTop", shootTop.getAppliedOutput());
     SmartDashboard.putNumber("ShootBottom", shootBottom.getAppliedOutput());
     SmartDashboard.putNumber("climb", climb.getSelectedSensorPosition());
+    SmartDashboard.putNumber("Match Time", DriverStation.getInstance().getMatchTime());
 
     // calculates the timer for the drive and prediction
     if (t < 51) {
