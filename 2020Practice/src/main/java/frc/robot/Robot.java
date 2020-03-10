@@ -276,7 +276,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+
+    //CHANGE THIS VARIABLE TO A NUMBER ABOVE 3 
+    //TO HAVE THE DEFAULT AUTO WHERE THE ROBOT DOESNT MOVE.
+    //SET THE VARIABLE TO 1 IN ORDER TO RUN THE DRIVE FORWARD
+    //AND SHOOT AUTONOMOUS.
     stage = 1;
+
+
     sequenceEnc.setPosition(0);
     r1.setNeutralMode(NeutralMode.Brake);
     l1.setNeutralMode(NeutralMode.Brake);
@@ -297,6 +304,33 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
+
+    //BASIC AUTO FOR GULL LAKE
+
+    switch (stage) {
+      case 1:
+        //TWEAK THE FIRST ARGUMENT TO ADJUST THE AMOUNT IT DRIVES FORWARD
+        Functions.DriveTo(100000, false, 0.3, true, false);
+
+        Functions.TargetAuton();
+        break;
+      case 2:
+        //TWEAK THE FIRST TWO ARGUMENTS TO ALTER THE SHOOTER WHEEL SPEEDS
+        //THE FIRST NUMBER CONTROLS THE BOTTOM WHEEL
+        //THE SECOND NUMBER CONTROLS THE TOP WHEEL
+        Functions.AutoShoot(2500, 3202, 0.5, false);
+
+      default:
+        r1.setNeutralMode(NeutralMode.Coast);
+        l1.setNeutralMode(NeutralMode.Coast);
+        r2.setNeutralMode(NeutralMode.Coast);
+        l2.setNeutralMode(NeutralMode.Coast);
+        break;
+      }
+
+
+    //COMPLICATED AUTO TO WORK ON FOR KENTWOOD AND ALPENA AND STATES
+    /*
     switch (m_autoSelected) {
     case KPortalAuto:
       switch (stage) {
@@ -347,7 +381,7 @@ public class Robot extends TimedRobot {
       l2.setNeutralMode(NeutralMode.Coast);
       break;
     }
-
+*/
   }
 
   /**
