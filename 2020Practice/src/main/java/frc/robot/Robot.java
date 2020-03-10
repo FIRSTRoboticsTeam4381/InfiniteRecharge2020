@@ -9,6 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.hal.sim.DriverStationSim;
 import edu.wpi.first.hal.sim.mockdata.DriverStationDataJNI;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SPI;
@@ -146,6 +147,11 @@ public class Robot extends TimedRobot {
   public AHRS ahrs;
   public boolean increment = false;
 
+  DigitalInput in;
+  DigitalInput out;
+
+  int ballcount = 0;
+
   /**
    * 1 This function is run when the robot is first started up and should be used
    * for any initialization code.
@@ -248,6 +254,9 @@ public class Robot extends TimedRobot {
     sequenceEnc.setPosition(0);
 
     ahrs.reset();
+
+    in = new DigitalInput(0);
+    out = new DigitalInput(1);
 
   }
 
@@ -426,6 +435,15 @@ public class Robot extends TimedRobot {
       }
 
     }
+
+    //count the number of balls
+    if(in.get()){
+      ballcount++;
+    }
+    else if(out.get()){
+      ballcount = ballcount - 1;
+    }
+
     // Shooter rev up
     if (spStick.getRawButton(1)) {
       if (shoot) {
@@ -580,6 +598,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("ShootBottom", shootBottom.getAppliedOutput());
     SmartDashboard.putNumber("climb", climb.getSelectedSensorPosition());
     SmartDashboard.putNumber("Match Time", DriverStation.getInstance().getMatchTime());
+    SmartDashboard.putNumber("Ball Count", ballcount);
 
     // calculates the timer for the drive and prediction
     if (t < 51) {
