@@ -310,6 +310,7 @@ public class Robot extends TimedRobot {
     switch (stage) {
       case 1:
         //TWEAK THE FIRST ARGUMENT TO ADJUST THE AMOUNT IT DRIVES FORWARD
+        //TWEAK THE THIRD ARGUMENT TO ADJUST THE SPEED AT WHICH THE ROBOT DRIVES FORWARD
         Functions.DriveTo(100000, false, 0.3, true, false);
 
         Functions.TargetAuton();
