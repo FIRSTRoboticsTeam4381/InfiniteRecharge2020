@@ -149,10 +149,11 @@ public class Robot extends TimedRobot {
   public AHRS ahrs;
   public boolean increment = false;
 
-  //DigitalInput in;
+  DigitalInput in;
   //DigitalInput out;
 
   int ballcount = 0;
+  boolean gotball = false;
 
   /**
    * 1 This function is run when the robot is first started up and should be used
@@ -257,7 +258,7 @@ public class Robot extends TimedRobot {
 
     ahrs.reset();
 
-    //in = new DigitalInput(0);
+    in = new DigitalInput(0);
     //out = new DigitalInput(1);
 
   }
@@ -476,10 +477,20 @@ public class Robot extends TimedRobot {
     }
 
     //count the number of balls
-    /*if(in.get()){
-      ballcount++;
+    if(!in.get()){
+      gotball = true;
     }
-    else if(out.get()){
+    else if(climbStick.getRawButton(7)){
+      ballcount = 0;
+      gotball = false;
+    }
+
+    if(gotball == true && in.get()){
+      ballcount++;
+      gotball = false;
+    }
+
+    /*else if(out.get()){
       ballcount = ballcount - 1;
     }*/
 
@@ -509,7 +520,7 @@ public class Robot extends TimedRobot {
         tempShoot += 0.7;
       }
 
-      if (shootTopEnc.getVelocity() > 2400 && shootBottomEnc.getVelocity() > 2900) {
+      if (shootTopEnc.getVelocity() > 2450 && shootBottomEnc.getVelocity() > 2950) {
         tempShoot += 0.5;
       }
 
