@@ -82,12 +82,12 @@ public class Robot extends TimedRobot {
   public double midx2 = 0;
   private double tensortime = 0;
 
-  public double offsetTar = 3; // Change Offsett value
+  public double offsetTar = -10; // Change Offsett value
   public double offsetBall = 20; // Change Offsett value
 
   public double sizeCheck = 70;
 
-  public double searchspeed = .15;
+  public double searchspeed = -.15;
   public double searchspeedTel = .15;
 
   public int t = 0;
@@ -102,6 +102,8 @@ public class Robot extends TimedRobot {
   private double camnum = 0;
 
   public double Turnvaltar = 0;
+
+  double time;
 
   // Joysticks
   private Joystick drStick = new Joystick(0);
@@ -147,8 +149,8 @@ public class Robot extends TimedRobot {
   public AHRS ahrs;
   public boolean increment = false;
 
-  DigitalInput in;
-  DigitalInput out;
+  //DigitalInput in;
+  //DigitalInput out;
 
   int ballcount = 0;
 
@@ -255,8 +257,8 @@ public class Robot extends TimedRobot {
 
     ahrs.reset();
 
-    in = new DigitalInput(0);
-    out = new DigitalInput(1);
+    //in = new DigitalInput(0);
+    //out = new DigitalInput(1);
 
   }
 
@@ -323,14 +325,27 @@ public class Robot extends TimedRobot {
       // TWEAK THE THIRD ARGUMENT TO ADJUST THE SPEED AT WHICH THE ROBOT DRIVES
       // FORWARD
       Functions.DriveTo(100000, false, 0.3, true, false);
-
-      Functions.TargetAuton();
       break;
     case 2:
+      Functions.TargetAuton();
+      break;
+    case 3:
       // TWEAK THE FIRST TWO ARGUMENTS TO ALTER THE SHOOTER WHEEL SPEEDS
       // THE FIRST NUMBER CONTROLS THE BOTTOM WHEEL
       // THE SECOND NUMBER CONTROLS THE TOP WHEEL
-      Functions.AutoShoot(2500, 3202, 0.5, false);
+      Functions.AutoShoot(3000, 2500, 0.5, false);
+      break;
+    case 4:
+      Functions.suckin();
+      Functions.DriveTo(150000, false, 0.3, true, false);
+      break;
+
+    case 5:
+      Functions.TargetAuton();
+      break;
+    case 6:
+      Functions.AutoShoot(3000, 2500, 0.5, false);
+      break;
 
     default:
       r1.setNeutralMode(NeutralMode.Coast);
@@ -339,6 +354,30 @@ public class Robot extends TimedRobot {
       l2.setNeutralMode(NeutralMode.Coast);
       break;
     }
+
+    /*switch (stage) {
+      case 1:
+        // TWEAK THE FIRST ARGUMENT TO ADJUST THE AMOUNT IT DRIVES FORWARD
+        // TWEAK THE THIRD ARGUMENT TO ADJUST THE SPEED AT WHICH THE ROBOT DRIVES
+        // FORWARD
+        Functions.DriveTo(100000, false, -0.3, true, false);
+        break;
+      case 2:
+        // TWEAK THE FIRST TWO ARGUMENTS TO ALTER THE SHOOTER WHEEL SPEEDS
+        // THE FIRST NUMBER CONTROLS THE BOTTOM WHEEL
+        // THE SECOND NUMBER CONTROLS THE TOP WHEEL
+        //Functions.AutoShoot(2500, 3202, 0.5, false);
+          
+        Functions.TargetAuton();
+        break;
+  
+      default:
+        r1.setNeutralMode(NeutralMode.Coast);
+        l1.setNeutralMode(NeutralMode.Coast);
+        r2.setNeutralMode(NeutralMode.Coast);
+        l2.setNeutralMode(NeutralMode.Coast);
+        break;
+      }*/
 
     // COMPLICATED AUTO TO WORK ON FOR KENTWOOD AND ALPENA AND STATES
     /*
@@ -380,6 +419,7 @@ public class Robot extends TimedRobot {
     size = SmartDashboard.getNumber("size", 0);
     midx1 = SmartDashboard.getNumber("mid x", 0);
     tensortime = SmartDashboard.getNumber("time", 0);
+    time = SmartDashboard.getNumber("time", 0);
 
     // Specials stuff
 
@@ -392,7 +432,6 @@ public class Robot extends TimedRobot {
 
     // If the button isnt pressed you can control it
     else {
-      gottar = false;
 
       // if its inbetween the two positions you can move it either way or you hit
       // button 6 or 7
@@ -437,15 +476,16 @@ public class Robot extends TimedRobot {
     }
 
     //count the number of balls
-    if(in.get()){
+    /*if(in.get()){
       ballcount++;
     }
     else if(out.get()){
       ballcount = ballcount - 1;
-    }
+    }*/
 
     // Shooter rev up
     if (spStick.getRawButton(1)) {
+      shootTurret.set(0);
       if (shoot) {
         tempShoot = sequenceEnc.getPosition() - sequenceEnc.getPosition() % 8.5;
         shoot = false;
@@ -457,10 +497,10 @@ public class Robot extends TimedRobot {
         kicker.set(-1);
       }
       // 0.88
-      botWheelPID.setReference(2500, ControlType.kVelocity);
-      topWheelPID.setReference(3202, ControlType.kVelocity);
-      // shootTop.set(1);
-      // shootBottom.set(1);
+      botWheelPID.setReference(3000, ControlType.kVelocity);
+      topWheelPID.setReference(2500, ControlType.kVelocity);
+      //shootTop.set(1);
+      //shootBottom.set(1);
       // shootTop.set(1);
       // shootBottom.set(1);
       // shootTurret.set(0);
@@ -469,7 +509,7 @@ public class Robot extends TimedRobot {
         tempShoot += 0.7;
       }
 
-      if (shootTopEnc.getVelocity() > 3100 && shootBottomEnc.getVelocity() > 2400) {
+      if (shootTopEnc.getVelocity() > 2400 && shootBottomEnc.getVelocity() > 2900) {
         tempShoot += 0.5;
       }
 

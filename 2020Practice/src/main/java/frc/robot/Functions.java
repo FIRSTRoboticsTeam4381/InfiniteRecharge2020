@@ -49,7 +49,7 @@ public class Functions {
         robot.kicker.set(-1);
         }
         if(robot.shootBottomEnc.getVelocity() < sbVel && robot.shootTopEnc.getVelocity() < stVel){
-          
+          ;
         }else{
             if(robot.sequenceEnc.getPosition() < 59.5 + robot.tempAutoShoot){
                robot.sequencer.set(indexVel);
@@ -80,6 +80,12 @@ public class Functions {
                 robot.stage++;
             }
     }
+
+    public static void suckin(){
+        
+      robot.sequencer.set(.2);
+      robot.Intake.set(-1);
+}
 
     public static void TurnBallVision(){
         //calulates the turn value of the robot
@@ -157,14 +163,15 @@ public class Functions {
 
       if(robot.distoff > 0){
           //subtract the offset - Make sure you have the correct value!!!
-          robot.distoff = robot.distoff - robot.offsetTar;
-      }
-
-      else{
           robot.distoff = robot.distoff + robot.offsetTar;
       }
 
+      else{
+          robot.distoff = robot.distoff - robot.offsetTar;
+      }
+
       if(robot.Visionclass.compareTo("Target") >= 0){
+        if((robot.time % 2) == 0){
         if(robot.size > robot.sizeCheck){
           if(robot.distoff > 10 || robot.distoff < -10){
             robot.gottar = false;
@@ -208,6 +215,10 @@ public class Functions {
       }
       else{
         robot.Turnvaltar = 0;
+      }
+      }
+      else{
+        robot.Turnvaltar = 0;
         robot.gottar = false;
         //robot.Turnvaltar = 0;
       
@@ -230,34 +241,42 @@ public class Functions {
       robot.Visionclass = SmartDashboard.getString("class", "");
       SmartDashboard.putNumber("ShootEnc", robot.shootTurret.getSelectedSensorPosition());
       SmartDashboard.putNumber("TurnVal", robot.Turnvaltar);
+      robot.time = SmartDashboard.getNumber("time", 0);
       robot.distoff = SmartDashboard.getNumber("distance off", 0);
 
       if(robot.distoff > 0){
         //subtract the offset - Make sure you have the correct value!!!
-        robot.distoff = robot.distoff - robot.offsetTar;
+        robot.distoff = robot.distoff + robot.offsetTar;
       }
 
       else{
-        robot.distoff = robot.distoff + robot.offsetTar;
+        robot.distoff = robot.distoff - robot.offsetTar;
       }
 
       if(robot.Visionclass.compareTo("Target") >= 0){
         if(robot.distoff >= 10 || robot.distoff <= -10){
-        
-          robot.Turnvaltar = (0.003125 * robot.distoff);  
-          robot.Turnvaltar = robot.Turnvaltar * 0.25;
+          
+          if((robot.time % 2) == 0){
+            robot.Turnvaltar = (0.003125 * robot.distoff);  
+            robot.Turnvaltar = robot.Turnvaltar * 0.25;
 
-          if(robot.Turnvaltar > 0 && robot.Turnvaltar < .1){
-            robot.Turnvaltar = .05;
+            
+            if(robot.Turnvaltar > 0 && robot.Turnvaltar < .1){
+              robot.Turnvaltar = .05;
+            }
+            if(robot.Turnvaltar < 0 && robot.Turnvaltar > -.1){
+              robot.Turnvaltar = -.05;
+            }
           }
-          if(robot.Turnvaltar < 0 && robot.Turnvaltar > -.1){
-            robot.Turnvaltar = -.05;
+          else{
+            robot.Turnvaltar = 0;
           }
 
         }
         else{
           robot.Turnvaltar = 0;
-          RevEmUp(1);
+          //RevEmUp(1);
+          robot.stage++;
           robot.increment = true;
         }
       }
